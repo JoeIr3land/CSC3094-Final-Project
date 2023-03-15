@@ -16,6 +16,7 @@ public class LightningGenerator : MonoBehaviour
     [SerializeField] int maxBranchesAtNode;
     [SerializeField] int nodeCountPerBranch;
     [SerializeField] float branchScale;
+    [SerializeField] float branchLineWidthMult;
 
     [Header("Subbranches")]
     [SerializeField] int subBranchCount;
@@ -26,34 +27,70 @@ public class LightningGenerator : MonoBehaviour
     [Header("Other")]
     [SerializeField] float randomScaleOnMainPath;
     [SerializeField] float randomScaleOnBranches;
+    [SerializeField] float drawSpeed;
 
 
     [Header("DO NOT CHANGE")]
     [SerializeField] GameObject lightningBranch;
 
+    LightningGenerator parentBranch;
     LineRenderer lr;
     Vector3[] nodeArray;
-    List<Vector3> branchList;
+    int drawPointer;
+    float error;
+    enum Stage
+    {
+        Grow,
+        Flash,
+        Fade,
+        Ended
+    }
+    Stage currentStage;
+    int branchesRemaining;
 
 
     // Start is called before the first frame update
     void Start()
     {
         nodeArray = new Vector3[nodeCount];
-        branchList = new List<Vector3>();
 
         nodeArray = GeneratePath(startNode.transform.position, targetNode.transform.position, randomScaleOnMainPath, nodeCount);
-        GenerateBranches();
+
+        branchesRemaining = branchCount;
 
         lr = GetComponent<LineRenderer>();
-        lr.positionCount = nodeArray.Length;
-        lr.SetPositions(nodeArray);
+        lr.positionCount = 1;
+        drawPointer = 0;
+        error = 0.0f;
+
+        currentStage = Stage.Grow;
+
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+        if (parentBranch) //If this instance is a branch of a bigger lightning section, then stop growing when parent reaches destination
+        {
+            currentStage = parentBranch.currentStage;
+        }
+
+        if (currentStage == Stage.Grow)
+        {
+            Debug.Log(error);
+            error += Time.deltaTime * drawSpeed;
+            while (error >= 0.5 && drawPointer < nodeArray.Length)
+            {
+                DrawPathSection(drawPointer);
+                drawPointer++;
+                error--;
+            }
+            if (drawPointer >= nodeArray.Length)
+            {
+                currentStage = Stage.Flash;
+            }
+        }
+
     }
 
     Vector3[] GeneratePath(Vector3 start, Vector3 target, float randomMult, int sectionCount)
@@ -82,49 +119,49 @@ public class LightningGenerator : MonoBehaviour
 
     }
 
-    void GenerateBranches()
+    void CreateBranch(Vector3 branchPoint)
     {
-        int branchesRemaining = branchCount;
+        float offset = (startNode.transform.position - targetNode.transform.position).magnitude * randomScaleOnBranches;
 
-        for (int i = 0; i < nodeCount-1; i++)
-        {
-            if(branchesRemaining > 0 && Random.Range(0.0f, 1.0f) <= chanceOfBranchAtNode)
-            {
-                int numBranchesatPoint = Mathf.Min(branchesRemaining, Random.Range(1, maxBranchesAtNode));
-                for (int j = 0; j < numBranchesatPoint; j++)
-                {
-                    Debug.Log("Adding branch at: ");
-                    Debug.Log(nodeArray[i]);
-                    branchList.Add(nodeArray[i]);
-                    branchesRemaining--;
-                }
-            }
+        GameObject branchStart = new GameObject();
+        GameObject branchTarget = new GameObject();
 
-        }
+        branchStart.transform.position = branchPoint;
+        Vector3 targetOffset = new Vector3(Random.Range(-(offset), offset),
+                                           Random.Range(-(offset), offset),
+                                           Random.Range(-(offset), offset));
+        branchTarget.transform.position = Vector3.Lerp(branchPoint, targetOffset, branchScale * nodeCountPerBranch);
 
-        for (int i = 1; i < branchList.Count; i++)
-        {
-            float offset = (startNode.transform.position - targetNode.transform.position).magnitude * randomScaleOnBranches;
+        GameObject branch = Instantiate(lightningBranch) as GameObject;
+        LightningGenerator branchGenerator = branch.GetComponent<LightningGenerator>();
+        branchGenerator.startNode = branchStart;
+        branchGenerator.targetNode = branchTarget;
+        branchGenerator.nodeCount = nodeCountPerBranch;
+        branchGenerator.branchCount = subBranchCount;
+        branchGenerator.subBranchCount = 0;
+        branchGenerator.randomScaleOnMainPath = randomScaleOnMainPath;
+        branchGenerator.branchScale = subBranchScale;
+        branchGenerator.parentBranch = this;
 
-            GameObject branchStart = new GameObject();
-            GameObject branchTarget = new GameObject();
-            branchStart.transform.position = branchList[i];
-            Vector3 targetOffset = new Vector3(Random.Range(-(offset), offset),
-                                               Random.Range(-(offset), offset),
-                                               Random.Range(-(offset), offset));
-            branchTarget.transform.position = Vector3.Lerp(branchList[i], targetOffset, branchScale*nodeCountPerBranch);
-
-            GameObject branch = Instantiate(lightningBranch) as GameObject;
-            LightningGenerator branchGenerator = branch.GetComponent<LightningGenerator>();
-            branchGenerator.startNode = branchStart;
-            branchGenerator.targetNode = branchTarget;
-            branchGenerator.nodeCount = nodeCountPerBranch;
-            branchGenerator.branchCount = subBranchCount;
-            branchGenerator.subBranchCount = 0;
-            branchGenerator.randomScaleOnMainPath = randomScaleOnMainPath;
-            branchGenerator.branchScale = subBranchScale;
-
-        }
+        LineRenderer branchLine = branch.GetComponent<LineRenderer>();
+        branchLine.widthMultiplier *= branchLineWidthMult;
     }
-    
+
+    void DrawPathSection(int i)
+    {
+        lr.positionCount = i + 1;
+        lr.SetPosition(i, nodeArray[i]);
+
+        if (branchesRemaining > 0 && Random.Range(0.0f, 1.0f) <= chanceOfBranchAtNode)
+        {
+            int numBranchesatPoint = Mathf.Min(branchesRemaining, Random.Range(1, maxBranchesAtNode));
+            for (int j = 0; j < numBranchesatPoint; j++)
+            {
+                CreateBranch(nodeArray[i]);
+                branchesRemaining--;
+            }
+        }
+
+    }
+
 }
