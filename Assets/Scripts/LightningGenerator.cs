@@ -20,19 +20,32 @@ public class LightningGenerator : MonoBehaviour
     [Header("Subbranches")]
     [SerializeField] int maxBranchDepth;
 
+    [Header("Light")]
+    [SerializeField] float preFlashIntensity;
+    [SerializeField] float flashIntensity;
+    [SerializeField] float fadeSpeed;
+
+    [Header("Line")]
+    [SerializeField] Color emissionColor;
+    [SerializeField] Color fadedemissionColor;
+
     [Header("Other")]
     [SerializeField] float randomScaleOnMainPath;
     [SerializeField] float randomScaleOnBranches;
     [SerializeField] float drawSpeed;
+    [SerializeField] bool isPerpetual;
 
 
     [Header("DO NOT CHANGE")]
-    [SerializeField] GameObject lightningBranch;
+    [SerializeField] GameObject lightningObj;
+
 
     LightningGenerator parentBranch;
     LineRenderer lr;
     int nodePointer;
     float error;
+    Vector3 currentNode;
+    float timeSinceNodeCreation;
     enum Stage
     {
         Grow,
@@ -42,35 +55,75 @@ public class LightningGenerator : MonoBehaviour
     }
     Stage currentStage;
     int branchesRemaining;
+    Light lightSource;
+    float timeSinceFlash;
+    Material lineMaterial;
 
 
     // Start is called before the first frame update
     void Start()
     {
+
         branchesRemaining = maxBranchCount;
-        nodePointer = 1;
-        error = 0.0f;
+        nodePointer = 0;
+        currentNode = startNode.transform.position;
+        timeSinceNodeCreation = 0.0f;
 
         lr = GetComponent<LineRenderer>();
         lr.positionCount = 1;
+        lineMaterial = lr.material;
         lr.SetPosition(0, startNode.transform.position);
 
         currentStage = Stage.Grow;
+
+        lightSource = GetComponent<Light>();
+        lightSource.intensity = preFlashIntensity;
 
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (parentBranch) //If this instance is a branch of a bigger lightning section, then stop growing when parent reaches destination
+        if (parentBranch & currentStage == Stage.Grow) //If this instance is a branch of a bigger lightning section, then stop growing when parent reaches destination
         {
-            currentStage = parentBranch.currentStage;
+            if(parentBranch.currentStage != Stage.Grow)
+            {
+                currentStage = Stage.Flash;
+            }
         }
 
         if (currentStage == Stage.Grow)
         {
-            Debug.Log(error);
-            error += Time.deltaTime * drawSpeed;
+            if(lr.GetPosition(nodePointer) == currentNode && nodePointer < nodeCount)
+            {
+                nodePointer++;
+                if(nodePointer >= nodeCount)
+                {
+                    currentStage = Stage.Flash;
+                }
+                else
+                {
+                    if (maxBranchDepth > 1)
+                    {
+                        CalculateIfBranch(nodePointer, currentNode);
+                    }
+
+                    currentNode = GenerateNode(nodePointer);
+
+                    lr.positionCount++;
+                    lr.SetPosition(nodePointer, lr.GetPosition(nodePointer - 1)); //Set position to beginning of new line section
+
+                    timeSinceNodeCreation = 0.0f;
+                }
+            }
+            else
+            {
+                timeSinceNodeCreation += Time.deltaTime;
+                Vector3 newLinePos = Vector3.Lerp(lr.GetPosition(nodePointer - 1), currentNode, timeSinceNodeCreation * drawSpeed);
+                lr.SetPosition(nodePointer, newLinePos);
+                transform.position = newLinePos;
+            }
+            /*error += Time.deltaTime * drawSpeed;
             while (error >= 0.5 && nodePointer < nodeCount)
             {
                 Vector3 newNode = GenerateNode(nodePointer);
@@ -79,13 +132,46 @@ public class LightningGenerator : MonoBehaviour
                     CalculateIfBranch(nodePointer, newNode);
                 }
                 DrawNode(nodePointer, newNode);
+                transform.position = newNode;
                 nodePointer++;
                 error--;
-            }
-            if (nodePointer >= nodeCount)
+            }*/
+        }
+
+        else if(currentStage == Stage.Flash)
+        {
+            lightSource.intensity = flashIntensity;
+            timeSinceFlash = 0.0f;
+            lineMaterial.SetColor("_EmissionColor", emissionColor);
+            if (!isPerpetual)
             {
-                currentStage = Stage.Flash;
+                currentStage = Stage.Fade;
             }
+        }
+
+        else if(currentStage == Stage.Fade)
+        {
+            timeSinceFlash += Time.deltaTime;
+            if(lightSource.intensity > 0)
+            {
+                lightSource.intensity = Mathf.Lerp(flashIntensity, 0, timeSinceFlash * fadeSpeed);
+                lineMaterial.SetColor("_EmissionColor", Color.Lerp(emissionColor, fadedemissionColor, timeSinceFlash * fadeSpeed));
+            }
+            else
+            {
+                currentStage = Stage.Ended;
+            }
+        }
+
+        else if(currentStage == Stage.Ended)
+        {
+            if (parentBranch) //If this instance is a sub-branch, destroy its temporary start and target objects - does not destroy start and target of main lightning bolt
+            {
+                Destroy(startNode);
+                Destroy(targetNode);
+            }
+            Destroy(lineMaterial);
+            Destroy(gameObject);
         }
 
     }
@@ -123,11 +209,11 @@ public class LightningGenerator : MonoBehaviour
                                            Random.Range(-(offset), offset));
         branchTarget.transform.position = Vector3.Lerp(node, targetOffset, branchScale * nodeCountOnBranch);
 
-        GameObject branch = Instantiate(lightningBranch) as GameObject;
+        GameObject branch = Instantiate(lightningObj) as GameObject;
         LightningGenerator branchGenerator = branch.GetComponent<LightningGenerator>();
         branchGenerator.startNode = branchStart;
         branchGenerator.targetNode = branchTarget;
-        branchGenerator.nodeCount = nodeCountOnBranch;
+        branchGenerator.nodeCount = this.nodeCount;
         branchGenerator.maxBranchCount = this.maxBranchCount;
         branchGenerator.randomScaleOnMainPath = this.randomScaleOnMainPath;
         branchGenerator.branchScale = this.branchScale;
@@ -159,5 +245,4 @@ public class LightningGenerator : MonoBehaviour
                 }
             }
         }
-
 }
