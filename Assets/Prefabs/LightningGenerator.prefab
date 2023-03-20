@@ -48,18 +48,22 @@ MonoBehaviour:
   startNode: {fileID: 0}
   targetNode: {fileID: 0}
   nodeCount: 10
-  branchCount: 0
-  chanceOfBranchAtNode: 0.75
+  maxBranchCount: 5
+  chanceOfBranchAtNode: 0.5
   maxBranchesAtNode: 2
-  nodeCountPerBranch: 3
-  branchScale: 0.05
-  subBranchCount: 4
-  maxBranchesAtSubNode: 2
-  nodeCountPerSubBranch: 2
-  subBranchScale: 0.05
-  randomScaleOnMainPath: 0.25
+  branchScale: 0.07
+  branchLineWidthMult: 0.75
+  maxBranchDepth: 4
+  preFlashIntensity: 0.025
+  flashIntensity: 0.25
+  fadeSpeed: 5
+  emissionColor: {r: 1, g: 1, b: 1, a: 1}
+  fadedemissionColor: {r: 0, g: 0.19058943, b: 1, a: 0.5254902}
+  randomScaleOnMainPath: 0.4
   randomScaleOnBranches: 0.5
-  lightningBranch: {fileID: 8179025285748640803}
+  drawSpeed: 10
+  isPerpetual: 0
+  lightningObj: {fileID: 8179025285748640803}
 --- !u!120 &8179025285748640802
 LineRenderer:
   serializedVersion: 2
