@@ -133,7 +133,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2531996781362246658, guid: a0c22e8d9a6e09e4eabcbe457df9d20f, type: 3}
       propertyPath: drawSpeed
-      value: 6
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 2531996781362246658, guid: a0c22e8d9a6e09e4eabcbe457df9d20f, type: 3}
       propertyPath: nodeCount
@@ -153,7 +153,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2531996781362246658, guid: a0c22e8d9a6e09e4eabcbe457df9d20f, type: 3}
       propertyPath: branchScale
-      value: 0.05
+      value: 0.07
+      objectReference: {fileID: 0}
+    - target: {fileID: 2531996781362246658, guid: a0c22e8d9a6e09e4eabcbe457df9d20f, type: 3}
+      propertyPath: maxBranchCount
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2531996781362246658, guid: a0c22e8d9a6e09e4eabcbe457df9d20f, type: 3}
+      propertyPath: maxBranchDepth
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 2531996781362246658, guid: a0c22e8d9a6e09e4eabcbe457df9d20f, type: 3}
       propertyPath: subBranchCount
@@ -165,7 +173,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2531996781362246658, guid: a0c22e8d9a6e09e4eabcbe457df9d20f, type: 3}
       propertyPath: maxBranchesAtNode
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 2531996781362246658, guid: a0c22e8d9a6e09e4eabcbe457df9d20f, type: 3}
       propertyPath: nodeCountPerBranch
