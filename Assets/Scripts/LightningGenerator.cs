@@ -14,11 +14,11 @@ public class LightningGenerator : MonoBehaviour
     [SerializeField] int branchCount;
     [SerializeField] float chanceOfBranchAtNode;
     [SerializeField] int maxBranchesAtNode;
-    [SerializeField] int nodeCountPerBranch;
+    [SerializeField] int nodeCountPerBranch; // Will be redundant if branches continue until the parent branch terminates
     [SerializeField] float branchScale;
     [SerializeField] float branchLineWidthMult;
 
-    [Header("Subbranches")]
+    [Header("Subbranches")] // These parameters need changing to accommodate depths >3
     [SerializeField] int subBranchCount;
     [SerializeField] int maxBranchesAtSubNode;
     [SerializeField] int nodeCountPerSubBranch;
@@ -35,8 +35,7 @@ public class LightningGenerator : MonoBehaviour
 
     LightningGenerator parentBranch;
     LineRenderer lr;
-    Vector3[] nodeArray;
-    int drawPointer;
+    int nodePointer;
     float error;
     enum Stage
     {
@@ -52,16 +51,13 @@ public class LightningGenerator : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        nodeArray = new Vector3[nodeCount];
-
-        nodeArray = GeneratePath(startNode.transform.position, targetNode.transform.position, randomScaleOnMainPath, nodeCount);
-
         branchesRemaining = branchCount;
+        nodePointer = 1;
+        error = 0.0f;
 
         lr = GetComponent<LineRenderer>();
         lr.positionCount = 1;
-        drawPointer = 0;
-        error = 0.0f;
+        lr.SetPosition(0, startNode.transform.position);
 
         currentStage = Stage.Grow;
 
@@ -79,13 +75,15 @@ public class LightningGenerator : MonoBehaviour
         {
             Debug.Log(error);
             error += Time.deltaTime * drawSpeed;
-            while (error >= 0.5 && drawPointer < nodeArray.Length)
+            while (error >= 0.5 && nodePointer < nodeCount)
             {
-                DrawPathSection(drawPointer);
-                drawPointer++;
+                Vector3 newNode = GenerateNode(nodePointer);
+                CalculateIfBranch(newNode);
+                DrawNode(nodePointer, newNode);
+                nodePointer++;
                 error--;
             }
-            if (drawPointer >= nodeArray.Length)
+            if (nodePointer >= nodeCount)
             {
                 currentStage = Stage.Flash;
             }
@@ -93,31 +91,25 @@ public class LightningGenerator : MonoBehaviour
 
     }
 
-    Vector3[] GeneratePath(Vector3 start, Vector3 target, float randomMult, int sectionCount)
+
+    Vector3 GenerateNode(int nodeNumber)
     {
-        float offset = (start - target).magnitude * randomMult;
 
-        Vector3[] outputArray = new Vector3[sectionCount];
+        Vector3 startPos = startNode.transform.position;
+        Vector3 targetPos = targetNode.transform.position;
+        float offset = (startPos - targetPos).magnitude * randomScaleOnMainPath;
 
-        outputArray[0] = start;
-
-        for (int i = 1; i < sectionCount; i++)
-        {
-            //Direct vector
-            Vector3 directVector = Vector3.Lerp(start, target, (1.0f / sectionCount) * (i + 1.0f));
-            //Vector with random offset
-            Vector3 randomVector = directVector + new Vector3(Random.Range(-(offset), offset),
-                                                              Random.Range(-(offset), offset),
-                                                              Random.Range(-(offset), offset));
-            //Create node as linear interpolation between offset position, and position along the normal, to ensure the lightning strikes its target
-            //Starts as 5050 between direct and random, eventually moving directly to the target for the final node
-            Vector3 newNode = Vector3.Lerp(randomVector, directVector, Mathf.Lerp(0.5f, 1.0f, (1.0f / sectionCount) * (i + 1.0f)));
-            outputArray[i] = newNode;
-        }
-
-        return outputArray;
-
+        //Direct vector
+        Vector3 directVector = Vector3.Lerp(startPos, targetPos, (1.0f / nodeCount) * (nodeNumber + 1.0f));
+        //Vector with random offset
+        Vector3 randomVector = directVector + new Vector3(Random.Range(-(offset), offset),
+                                                          Random.Range(-(offset), offset),
+                                                          Random.Range(-(offset), offset));
+        //Create node as linear interpolation between offset position, and position along the normal, to ensure the lightning strikes its target
+        //Starts as 5050 between direct and random, eventually moving directly to the target for the final node
+        return Vector3.Lerp(randomVector, directVector, Mathf.Lerp(0.5f, 1.0f, (1.0f / nodeCount) * (nodeNumber + 1.0f)));
     }
+
 
     void CreateBranch(Vector3 branchPoint)
     {
@@ -147,21 +139,25 @@ public class LightningGenerator : MonoBehaviour
         branchLine.widthMultiplier *= branchLineWidthMult;
     }
 
-    void DrawPathSection(int i)
-    {
-        lr.positionCount = i + 1;
-        lr.SetPosition(i, nodeArray[i]);
 
-        if (branchesRemaining > 0 && Random.Range(0.0f, 1.0f) <= chanceOfBranchAtNode)
+    void DrawNode(int i, Vector3 node)
         {
-            int numBranchesatPoint = Mathf.Min(branchesRemaining, Random.Range(1, maxBranchesAtNode));
-            for (int j = 0; j < numBranchesatPoint; j++)
-            {
-                CreateBranch(nodeArray[i]);
-                branchesRemaining--;
-            }
+            lr.positionCount = i + 1;
+            lr.SetPosition(i, node);
         }
 
-    }
+
+    void CalculateIfBranch(Vector3 node)
+        {
+            if (branchesRemaining > 0 && Random.Range(0.0f, 1.0f) <= chanceOfBranchAtNode)
+            {
+                int numBranchesatPoint = Mathf.Min(branchesRemaining, Random.Range(1, maxBranchesAtNode));
+                for (int i = 0; i < numBranchesatPoint; i++)
+                {
+                    CreateBranch(node);
+                    branchesRemaining--;
+                }
+            }
+        }
 
 }
