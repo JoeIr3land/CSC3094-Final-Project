@@ -2,45 +2,51 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class LightningGenerator : MonoBehaviour
+public class LightningEffect : MonoBehaviour
 {
 
     [Header("Main Path")]
-    [SerializeField] GameObject startNode;
-    [SerializeField] GameObject targetNode;
-    [SerializeField] int nodeCount;
+    [SerializeField] public GameObject startNode;
+    [SerializeField] public GameObject targetNode;
+    [SerializeField] public int nodeCount;
 
     [Header("Branches")]
-    [SerializeField] int maxBranchCount;
-    [SerializeField] float chanceOfBranchAtNode;
-    [SerializeField] int maxBranchesAtNode;
-    [SerializeField] float branchScale;
-    [SerializeField] float branchLineWidthMult;
+    [SerializeField] public int maxBranchCount;
+    [SerializeField] public float chanceOfBranchAtNode;
+    [SerializeField] public int maxBranchesAtNode;
+    [SerializeField] public float branchScale;
+    [SerializeField] public float branchLineWidthMult;
 
     [Header("Subbranches")]
-    [SerializeField] int maxBranchDepth;
+    [SerializeField] public int maxBranchDepth;
 
     [Header("Light")]
-    [SerializeField] float preFlashIntensity;
-    [SerializeField] float flashIntensity;
-    [SerializeField] float fadeSpeed;
+    [SerializeField] public float preFlashIntensity;
+    [SerializeField] public float flashIntensity;
+    [SerializeField] public float branchPreFlashIntensityMult;
+    [SerializeField] public float branchFlashIntensityMult;
 
     [Header("Line")]
-    [SerializeField] Color emissionColor;
-    [SerializeField] Color fadedemissionColor;
+    [SerializeField] public Color emissionColor;
+    [SerializeField] public Color fadedEmissionColor;
+
+    [Header("Animation")]
+    [SerializeField] public float fadeSpeed;
+    [SerializeField] public float drawSpeed;
+
+    [Header("Path Randomness")]
+    [SerializeField] public float randomScaleOnMainPath;
+    [SerializeField] public float randomScaleBranchTarget;
+    [SerializeField] public float randomScaleBranchPath;
 
     [Header("Other")]
-    [SerializeField] float randomScaleOnMainPath;
-    [SerializeField] float randomScaleOnBranches;
-    [SerializeField] float drawSpeed;
-    [SerializeField] bool isPerpetual;
-
+    [SerializeField] public bool isPerpetual;
 
     [Header("DO NOT CHANGE")]
     [SerializeField] GameObject lightningObj;
 
 
-    LightningGenerator parentBranch;
+    LightningEffect parentBranch;
     LineRenderer lr;
     int nodePointer;
     float error;
@@ -123,19 +129,7 @@ public class LightningGenerator : MonoBehaviour
                 lr.SetPosition(nodePointer, newLinePos);
                 transform.position = newLinePos;
             }
-            /*error += Time.deltaTime * drawSpeed;
-            while (error >= 0.5 && nodePointer < nodeCount)
-            {
-                Vector3 newNode = GenerateNode(nodePointer);
-                if(maxBranchDepth > 1)
-                {
-                    CalculateIfBranch(nodePointer, newNode);
-                }
-                DrawNode(nodePointer, newNode);
-                transform.position = newNode;
-                nodePointer++;
-                error--;
-            }*/
+
         }
 
         else if(currentStage == Stage.Flash)
@@ -155,7 +149,7 @@ public class LightningGenerator : MonoBehaviour
             if(lightSource.intensity > 0)
             {
                 lightSource.intensity = Mathf.Lerp(flashIntensity, 0, timeSinceFlash * fadeSpeed);
-                lineMaterial.SetColor("_EmissionColor", Color.Lerp(emissionColor, fadedemissionColor, timeSinceFlash * fadeSpeed));
+                lineMaterial.SetColor("_EmissionColor", Color.Lerp(emissionColor, fadedEmissionColor, timeSinceFlash * fadeSpeed));
             }
             else
             {
@@ -198,7 +192,7 @@ public class LightningGenerator : MonoBehaviour
 
     void CreateBranch(int nodeIndex, Vector3 node)
     {
-        float offset = (startNode.transform.position - targetNode.transform.position).magnitude * randomScaleOnBranches;
+        float offset = (startNode.transform.position - targetNode.transform.position).magnitude * randomScaleBranchTarget;
         int nodeCountOnBranch = nodeCount - nodeIndex; //Max number of nodes equal nodes remaining of parent branch, so it stops generating when the main path reaches its target
         GameObject branchStart = new GameObject();
         GameObject branchTarget = new GameObject();
@@ -210,16 +204,32 @@ public class LightningGenerator : MonoBehaviour
         branchTarget.transform.position = Vector3.Lerp(node, targetOffset, branchScale * nodeCountOnBranch);
 
         GameObject branch = Instantiate(lightningObj) as GameObject;
-        LightningGenerator branchGenerator = branch.GetComponent<LightningGenerator>();
-        branchGenerator.startNode = branchStart;
-        branchGenerator.targetNode = branchTarget;
-        branchGenerator.nodeCount = this.nodeCount;
-        branchGenerator.maxBranchCount = this.maxBranchCount;
-        branchGenerator.randomScaleOnMainPath = this.randomScaleOnMainPath;
-        branchGenerator.branchScale = this.branchScale;
-        branchGenerator.maxBranchDepth = this.maxBranchDepth - 1;
+        LightningEffect bg = branch.GetComponent<LightningEffect>();
+        bg.parentBranch = this;
 
-        branchGenerator.parentBranch = this;
+        bg.startNode = branchStart;
+        bg.targetNode = branchTarget;
+        bg.nodeCount = this.nodeCount;
+
+        bg.maxBranchCount = this.maxBranchCount;
+        bg.chanceOfBranchAtNode = this.chanceOfBranchAtNode;
+        bg.maxBranchesAtNode = this.maxBranchesAtNode;
+        bg.branchScale = this.branchScale;
+        bg.branchLineWidthMult = this.branchLineWidthMult;
+
+        bg.maxBranchDepth = this.maxBranchDepth - 1;
+
+        bg.preFlashIntensity = this.preFlashIntensity * branchPreFlashIntensityMult;
+        bg.flashIntensity = this.preFlashIntensity * branchPreFlashIntensityMult;
+        bg.branchPreFlashIntensityMult = this.branchPreFlashIntensityMult;
+        bg.branchFlashIntensityMult = this.branchFlashIntensityMult;
+
+        bg.fadeSpeed = fadeSpeed;
+        bg.drawSpeed = drawSpeed;
+
+        bg.randomScaleOnMainPath = randomScaleOnMainPath * randomScaleBranchPath;
+        bg.randomScaleBranchPath = randomScaleBranchPath;
+        bg.isPerpetual = isPerpetual;
 
         LineRenderer branchLine = branch.GetComponent<LineRenderer>();
         branchLine.widthMultiplier *= branchLineWidthMult;
