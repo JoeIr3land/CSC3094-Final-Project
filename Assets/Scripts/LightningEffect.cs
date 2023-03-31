@@ -2,59 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class LightningEffect : MonoBehaviour
+public class LightningEffect : LightningCreator
 {
-
-    [Header("Main Path")]
-    [SerializeField] public Vector3 startNode;
-    [SerializeField] public Vector3 targetNode;
-    [SerializeField] public float nodeScale;
-    [SerializeField] public float targetOuterThreshold;
-    [SerializeField] public float targetInnerThreshold;
-
-    [Header("Branches")]
-    [SerializeField] public int maxBranchCount;
-    [SerializeField] public float chanceOfBranchAtNode;
-    [SerializeField] public float chanceOfBranchScaleMult;
-    [SerializeField] public float minNodesBetweenBranching;
-    [SerializeField] public int maxBranchesAtNode;
-    [SerializeField] public float branchLineWidthMult;
-
-    [Header("Subbranches")]
-    [SerializeField] public int maxBranchDepth;
-
-    [Header("Light")]
-    [SerializeField] public float preFlashIntensity;
-    [SerializeField] public float flashIntensity;
-    [SerializeField] public float branchPreFlashIntensityMult;
-    [SerializeField] public float branchFlashIntensityMult;
-
-    [Header("Line")]
-    [SerializeField] public Color emissionColor;
-    [SerializeField] public Color fadedEmissionColor;
-
-    [Header("Animation")]
-    [SerializeField] public float fadeSpeed;
-    [SerializeField] public float drawSpeed;
-
-    [Header("Path Randomness")]
-    [SerializeField] public float maxAngleDirectionChange;
-    [SerializeField] public float randomnessWeight;
-    [SerializeField] public float randomnessWeightBranchMult;
-
-    [Header("Other")]
-    [SerializeField] public bool isPerpetual;
-
-    [Header("DO NOT CHANGE")]
-    [SerializeField] GameObject lightningObj;
-
-
+    public Vector3 startNode;
+    public Vector3 targetNode;
     LightningEffect parentBranch;
-    LineRenderer lr;
-    int nodePointer;
-    float error;
-    Vector3 currentNode;
-    float timeSinceNodeCreation;
+
     enum Stage
     {
         Grow,
@@ -63,11 +16,20 @@ public class LightningEffect : MonoBehaviour
         Ended
     }
     Stage currentStage;
+
+    LineRenderer lr;
+    Material lineMaterial;
+
+    int nodePointer;
+    Vector3 currentNode;
+    float timeSinceNodeCreation;
+    
     int branchesRemaining;
     int pointOfLastBranch;
+
     Light lightSource;
     float timeSinceFlash;
-    Material lineMaterial;
+
 
 
     // Start is called before the first frame update

@@ -4,9 +4,11 @@ using UnityEngine;
 
 public class LightningCreator : MonoBehaviour
 {
-    [Header("Main Path")]
+    [Header("Source/Target")]
     [SerializeField] public GameObject startObj;
     [SerializeField] public GameObject targetObj;
+
+    [Header("Main Path")]
     [SerializeField] public float nodeScale;
     [SerializeField] public float targetOuterThreshold;
     [SerializeField] public float targetInnerThreshold;
@@ -45,7 +47,7 @@ public class LightningCreator : MonoBehaviour
     [SerializeField] public bool isPerpetual;
 
     [Header("Lightning Effect Type")]
-    [SerializeField] GameObject lightningObj;
+    [SerializeField] protected GameObject lightningObj;
 
 
     // Start is called before the first frame update
