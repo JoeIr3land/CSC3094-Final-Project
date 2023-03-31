@@ -22,6 +22,7 @@ public class LightningEffect : LightningCreator
 
     int segmentPointer;
     Vector3 currentSegmentPos;
+    float error;
     float timeSinceSegmentCreation;
     
     int branchesRemaining;
@@ -35,22 +36,20 @@ public class LightningEffect : LightningCreator
     // Start is called before the first frame update
     void Start()
     {
-
+        transform.position = sourcePos;
         branchesRemaining = maxBranchCount;
-        segmentPointer = 0;
+        currentStage = Stage.Grow;
         currentSegmentPos = sourcePos;
-        timeSinceSegmentCreation = 0.0f;
+        segmentPointer = 0;
+        error = 0.0f;
+
+        lightSource = GetComponent<Light>();
+        lightSource.intensity = preFlashIntensity;
 
         lr = GetComponent<LineRenderer>();
         lr.positionCount = 1;
         lineMaterial = lr.material;
         lr.SetPosition(0, sourcePos);
-
-        currentStage = Stage.Grow;
-
-        lightSource = GetComponent<Light>();
-        lightSource.intensity = preFlashIntensity;
-
     }
 
     // Update is called once per frame
@@ -66,38 +65,7 @@ public class LightningEffect : LightningCreator
 
         if (currentStage == Stage.Grow)
         {
-            if (lr.GetPosition(segmentPointer) == currentSegmentPos) //Only calculate new node when previous segment has finished animating
-            {
-                float distanceToTarget = Vector3.Distance(lr.GetPosition(segmentPointer), targetPos);
-                if (distanceToTarget < targetInnerThreshold)
-                {
-                    currentStage = Stage.Flash;
-                }
-                else //First decide if branch will be generated, then create the next point on the path
-                {
-                    if (maxBranchDepth > 1)
-                    {
-                        CalculateIfBranch(segmentPointer, currentSegmentPos);
-                    }
-
-                    segmentPointer++;
-                    currentSegmentPos = GenerateSegment(segmentPointer);
-
-                    lr.positionCount++;
-                    lr.SetPosition(segmentPointer, lr.GetPosition(segmentPointer - 1)); //Set position to beginning of new segment
-
-                    timeSinceSegmentCreation = 0.0f;
-
-                }
-            }
-            else
-            {
-                timeSinceSegmentCreation += Time.deltaTime;
-                Vector3 newLinePos = Vector3.Lerp(lr.GetPosition(segmentPointer - 1), currentSegmentPos, timeSinceSegmentCreation * drawSpeed);
-                lr.SetPosition(segmentPointer, newLinePos);
-                transform.position = newLinePos;
-            }
-
+            Grow();
         }
 
         else if (currentStage == Stage.Flash)
@@ -132,6 +100,79 @@ public class LightningEffect : LightningCreator
             Destroy(gameObject);
         }
 
+    }
+
+    void Grow()
+    {
+        float distanceTravelled = Time.deltaTime * drawSpeed;
+        if(distanceTravelled < segmentSize) //If distance travelled in a frame is less than the length of a segment, smoothly animate segment growth
+        {
+            if (lr.GetPosition(segmentPointer) == currentSegmentPos) //Calculate new segment when previous segment finishes animating
+            {
+                if (checkDistanceToTarget())
+                {
+                    currentStage = Stage.Flash;
+                }
+                else //First decide if branch will be generated, then create the next point on the path
+                {
+                    if (maxBranchDepth > 1)
+                    {
+                        CalculateIfBranch(segmentPointer, currentSegmentPos);
+                    }
+
+                    segmentPointer++;
+                    currentSegmentPos = GenerateSegment(segmentPointer);
+                    Debug.Log("new segment");
+
+                    lr.positionCount++;
+                    lr.SetPosition(segmentPointer, lr.GetPosition(segmentPointer - 1)); //Set position to beginning of new segment
+                    timeSinceSegmentCreation = 0.0f;
+                }
+            }
+            else
+            {
+                moveLinePos();
+            }
+        }
+        else //If distance travelled in a frame is more than the length of one segment, then generate and render segments in their entirety (>1 per frame if needed)
+        {
+            error += distanceTravelled;
+            while (error >= 0.5f)
+            {
+                if (maxBranchDepth > 1)
+                {
+                    CalculateIfBranch(segmentPointer, currentSegmentPos);
+                }
+
+                segmentPointer++;
+                currentSegmentPos = GenerateSegment(segmentPointer);
+
+                lr.positionCount++;
+                lr.SetPosition(segmentPointer, currentSegmentPos); //Set position to end of new segment
+                transform.position = currentSegmentPos;
+                error--;
+
+                if (checkDistanceToTarget())
+                {
+                    currentStage = Stage.Flash;
+                    error = 0.0f;
+                }
+
+            }
+        }
+    }
+
+    void moveLinePos()
+    {
+        timeSinceSegmentCreation += Time.deltaTime;
+        Vector3 newLinePos = Vector3.Lerp(lr.GetPosition(segmentPointer - 1), currentSegmentPos, (timeSinceSegmentCreation * drawSpeed) / segmentSize);
+        lr.SetPosition(segmentPointer, newLinePos);
+        transform.position = newLinePos;
+    }
+
+    bool checkDistanceToTarget()
+    {
+        return Vector3.Distance(lr.GetPosition(segmentPointer), targetPos) < targetInnerThreshold;
     }
 
 
