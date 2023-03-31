@@ -5,15 +5,18 @@ using UnityEngine;
 public class LightningCreator : MonoBehaviour
 {
     [Header("Main Path")]
-    [SerializeField] public GameObject startNode;
-    [SerializeField] public GameObject targetNode;
-    [SerializeField] public int nodeCount;
+    [SerializeField] public GameObject startObj;
+    [SerializeField] public GameObject targetObj;
+    [SerializeField] public float nodeScale;
+    [SerializeField] public float targetOuterThreshold;
+    [SerializeField] public float targetInnerThreshold;
 
     [Header("Branches")]
     [SerializeField] public int maxBranchCount;
     [SerializeField] public float chanceOfBranchAtNode;
+    [SerializeField] public float chanceOfBranchScaleMult;
+    [SerializeField] public float minNodesBetweenBranching;
     [SerializeField] public int maxBranchesAtNode;
-    [SerializeField] public float branchScale;
     [SerializeField] public float branchLineWidthMult;
 
     [Header("Subbranches")]
@@ -34,9 +37,9 @@ public class LightningCreator : MonoBehaviour
     [SerializeField] public float drawSpeed;
 
     [Header("Path Randomness")]
-    [SerializeField] public float randomScaleOnMainPath;
-    [SerializeField] public float randomScaleBranchTarget;
-    [SerializeField] public float randomScaleBranchPath;
+    [SerializeField] public float maxAngleDirectionChange;
+    [SerializeField] public float randomnessWeight;
+    [SerializeField] public float randomnessWeightBranchMult;
 
     [Header("Other")]
     [SerializeField] public bool isPerpetual;
@@ -56,7 +59,7 @@ public class LightningCreator : MonoBehaviour
     {
         if (Input.GetButtonDown("Fire1"))
         {
-            CreateLightningBolt(startNode, targetNode);
+            CreateLightningBolt(startObj, targetObj);
         }
     }
 
@@ -64,14 +67,17 @@ public class LightningCreator : MonoBehaviour
     {
         GameObject lightningBolt = Instantiate(lightningObj) as GameObject;
         LightningEffect le = lightningBolt.GetComponent<LightningEffect>();
-        le.startNode = start;
-        le.targetNode = target;
-        le.nodeCount = nodeCount;
+        le.startNode = start.transform.position;
+        le.targetNode = target.transform.position;
+        le.nodeScale = nodeScale;
+        le.targetOuterThreshold = targetOuterThreshold;
+        le.targetInnerThreshold = targetInnerThreshold;
 
         le.maxBranchCount = maxBranchCount;
         le.chanceOfBranchAtNode = chanceOfBranchAtNode;
+        le.chanceOfBranchScaleMult = chanceOfBranchScaleMult;
+        le.minNodesBetweenBranching = minNodesBetweenBranching;
         le.maxBranchesAtNode = maxBranchesAtNode;
-        le.branchScale = branchScale;
         le.branchLineWidthMult = branchLineWidthMult;
 
         le.maxBranchDepth = maxBranchDepth;
@@ -87,9 +93,9 @@ public class LightningCreator : MonoBehaviour
         le.fadeSpeed = fadeSpeed;
         le.drawSpeed = drawSpeed;
 
-        le.randomScaleOnMainPath = randomScaleOnMainPath;
-        le.randomScaleBranchTarget = randomScaleBranchTarget;
-        le.randomScaleBranchPath = randomScaleBranchPath;
+        le.maxAngleDirectionChange = maxAngleDirectionChange;
+        le.randomnessWeight = randomnessWeight;
+        le.randomnessWeightBranchMult = randomnessWeightBranchMult;
 
         le.isPerpetual = isPerpetual;
 

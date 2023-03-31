@@ -6,15 +6,18 @@ public class LightningEffect : MonoBehaviour
 {
 
     [Header("Main Path")]
-    [SerializeField] public GameObject startNode;
-    [SerializeField] public GameObject targetNode;
-    [SerializeField] public int nodeCount;
+    [SerializeField] public Vector3 startNode;
+    [SerializeField] public Vector3 targetNode;
+    [SerializeField] public float nodeScale;
+    [SerializeField] public float targetOuterThreshold;
+    [SerializeField] public float targetInnerThreshold;
 
     [Header("Branches")]
     [SerializeField] public int maxBranchCount;
     [SerializeField] public float chanceOfBranchAtNode;
+    [SerializeField] public float chanceOfBranchScaleMult;
+    [SerializeField] public float minNodesBetweenBranching;
     [SerializeField] public int maxBranchesAtNode;
-    [SerializeField] public float branchScale;
     [SerializeField] public float branchLineWidthMult;
 
     [Header("Subbranches")]
@@ -35,9 +38,9 @@ public class LightningEffect : MonoBehaviour
     [SerializeField] public float drawSpeed;
 
     [Header("Path Randomness")]
-    [SerializeField] public float randomScaleOnMainPath;
-    [SerializeField] public float randomScaleBranchTarget;
-    [SerializeField] public float randomScaleBranchPath;
+    [SerializeField] public float maxAngleDirectionChange;
+    [SerializeField] public float randomnessWeight;
+    [SerializeField] public float randomnessWeightBranchMult;
 
     [Header("Other")]
     [SerializeField] public bool isPerpetual;
@@ -61,6 +64,7 @@ public class LightningEffect : MonoBehaviour
     }
     Stage currentStage;
     int branchesRemaining;
+    int pointOfLastBranch;
     Light lightSource;
     float timeSinceFlash;
     Material lineMaterial;
@@ -72,13 +76,13 @@ public class LightningEffect : MonoBehaviour
 
         branchesRemaining = maxBranchCount;
         nodePointer = 0;
-        currentNode = startNode.transform.position;
+        currentNode = startNode;
         timeSinceNodeCreation = 0.0f;
 
         lr = GetComponent<LineRenderer>();
         lr.positionCount = 1;
         lineMaterial = lr.material;
-        lr.SetPosition(0, startNode.transform.position);
+        lr.SetPosition(0, startNode);
 
         currentStage = Stage.Grow;
 
@@ -92,7 +96,7 @@ public class LightningEffect : MonoBehaviour
     {
         if (parentBranch & currentStage == Stage.Grow) //If this instance is a branch of a bigger lightning section, then stop growing when parent reaches destination
         {
-            if(parentBranch.currentStage != Stage.Grow)
+            if (parentBranch.currentStage != Stage.Grow)
             {
                 currentStage = Stage.Flash;
             }
@@ -100,26 +104,28 @@ public class LightningEffect : MonoBehaviour
 
         if (currentStage == Stage.Grow)
         {
-            if(lr.GetPosition(nodePointer) == currentNode && nodePointer < nodeCount)//Only calculate new node when previous segment has finished animating
+            if (lr.GetPosition(nodePointer) == currentNode) //Only calculate new node when previous segment has finished animating
             {
-                nodePointer++;
-                if(nodePointer >= nodeCount)
+                float distanceToTarget = Vector3.Distance(lr.GetPosition(nodePointer), targetNode);
+                if (distanceToTarget < targetInnerThreshold)
                 {
                     currentStage = Stage.Flash;
                 }
-                else
+                else //First decide if branch will be generated, then create the next point on the path
                 {
                     if (maxBranchDepth > 1)
                     {
                         CalculateIfBranch(nodePointer, currentNode);
                     }
 
+                    nodePointer++;
                     currentNode = GenerateNode(nodePointer);
 
                     lr.positionCount++;
-                    lr.SetPosition(nodePointer, lr.GetPosition(nodePointer - 1)); //Set position to beginning of new line section
+                    lr.SetPosition(nodePointer, lr.GetPosition(nodePointer - 1)); //Set position to beginning of new segment
 
                     timeSinceNodeCreation = 0.0f;
+
                 }
             }
             else
@@ -132,8 +138,9 @@ public class LightningEffect : MonoBehaviour
 
         }
 
-        else if(currentStage == Stage.Flash)
+        else if (currentStage == Stage.Flash)
         {
+            if (parentBranch) { parentBranch.currentStage = Stage.Flash; } //Makes whole structure flash if sub-branch reaches target first
             lightSource.intensity = flashIntensity; //Set point light intensity
             timeSinceFlash = 0.0f;
             lineMaterial.SetColor("_EmissionColor", emissionColor); //Set line renderer's material emission colour
@@ -143,10 +150,10 @@ public class LightningEffect : MonoBehaviour
             }
         }
 
-        else if(currentStage == Stage.Fade)
+        else if (currentStage == Stage.Fade)
         {
             timeSinceFlash += Time.deltaTime;
-            if(lightSource.intensity > 0)
+            if (lightSource.intensity > 0)
             {
                 lightSource.intensity = Mathf.Lerp(flashIntensity, 0, timeSinceFlash * fadeSpeed);
                 lineMaterial.SetColor("_EmissionColor", Color.Lerp(emissionColor, fadedEmissionColor, timeSinceFlash * fadeSpeed));
@@ -157,13 +164,8 @@ public class LightningEffect : MonoBehaviour
             }
         }
 
-        else if(currentStage == Stage.Ended)
+        else if (currentStage == Stage.Ended)
         {
-            if (parentBranch) //If this instance is a sub-branch, destroy its temporary start and target objects - does not destroy start and target of main lightning bolt
-            {
-                Destroy(startNode);
-                Destroy(targetNode);
-            }
             Destroy(lineMaterial);
             Destroy(gameObject);
         }
@@ -173,63 +175,67 @@ public class LightningEffect : MonoBehaviour
 
     Vector3 GenerateNode(int nodeNumber)
     {
+        Vector3 prevNode = lr.GetPosition(nodeNumber - 1);
+        float distanceToTarget = Vector3.Distance(prevNode, targetNode);
+        if (distanceToTarget < nodeScale) { return targetNode; } //If distance to target is less than the length of a node, then return the target node to prevent overshooting and circling back
 
-        Vector3 startPos = startNode.transform.position;
-        Vector3 targetPos = targetNode.transform.position;
-        float offset = (startPos - targetPos).magnitude * randomScaleOnMainPath;
+        Vector3 directionPreviousSegment;
+        Vector3 newDirection;
 
-        //Direct vector
-        Vector3 directVector = Vector3.Lerp(startPos, targetPos, (1.0f / nodeCount) * (nodeNumber + 1.0f));
-        //Vector with random offset
-        Vector3 randomVector = directVector + new Vector3(Random.Range(-(offset), offset),
-                                                          Random.Range(-(offset), offset),
-                                                          Random.Range(-(offset), offset));
-        //Create node as linear interpolation between offset position, and position along the normal, to ensure the lightning strikes its target
-        //Starts as 5050 between direct and random, eventually moving directly to the target for the final node
-        return Vector3.Lerp(randomVector, directVector, Mathf.Lerp(0.5f, 1.0f, (1.0f / nodeCount) * (nodeNumber + 1.0f)));
+        //Direction to target
+        Vector3 directionToTarget = (targetNode - prevNode).normalized;
+        //Direction of previous segment (if first segment after start, then direction = direct vector)
+        if (nodeNumber > 1) { directionPreviousSegment = (prevNode - lr.GetPosition(nodeNumber - 2)).normalized; }
+        else { directionPreviousSegment = directionToTarget; }
+        //Random direction
+        Vector3 directionRandom = new Vector3(Random.Range(-1.0f, 1.0f),
+                                              Random.Range(-1.0f, 1.0f),
+                                              Random.Range(-1.0f, 1.0f));
+        //Interpolate direction between moving directly to target, and moving in random position (when near target, move as directly to target as allowed within rotation)
+        if (distanceToTarget > targetOuterThreshold) { newDirection = Vector3.Lerp(directionToTarget, directionRandom, randomnessWeight); }
+        else { newDirection = directionToTarget; }
+        //Clamp newDirection to be within allowed angle of direction change (if nearing inner threshold, do not clamp)
+        float angle = Vector3.Angle(directionPreviousSegment, newDirection);
+        float factor = maxAngleDirectionChange / angle;
+        newDirection = Vector3.Slerp(directionPreviousSegment, newDirection, factor);
+        //Calculate new node position
+        return prevNode + (newDirection * nodeScale);
     }
 
 
-    void CreateBranch(int nodeIndex, Vector3 node)
+    void CreateBranch(Vector3 branchPoint)
     {
-        float offset = (startNode.transform.position - targetNode.transform.position).magnitude * randomScaleBranchTarget;
-        int nodeCountOnBranch = nodeCount - nodeIndex; //Max number of nodes equal nodes remaining of parent branch, so it stops generating when the main path reaches its target
-        GameObject branchStart = new GameObject();
-        GameObject branchTarget = new GameObject();
-
-        branchStart.transform.position = node;
-        Vector3 targetOffset = new Vector3(Random.Range(-(offset), offset),
-                                           Random.Range(-(offset), offset),
-                                           Random.Range(-(offset), offset));
-        branchTarget.transform.position = Vector3.Lerp(node, targetOffset, branchScale * nodeCountOnBranch);
-
         GameObject branch = Instantiate(lightningObj) as GameObject;
-        LightningEffect bg = branch.GetComponent<LightningEffect>();
-        bg.parentBranch = this;
+        LightningEffect le = branch.GetComponent<LightningEffect>();
+        le.parentBranch = this;
 
-        bg.startNode = branchStart;
-        bg.targetNode = branchTarget;
-        bg.nodeCount = this.nodeCount;
+        le.startNode = branchPoint;
+        le.targetNode = targetNode;
+        le.nodeScale = nodeScale;
+        le.targetOuterThreshold = targetOuterThreshold;
+        le.targetInnerThreshold = targetInnerThreshold;
 
-        bg.maxBranchCount = this.maxBranchCount;
-        bg.chanceOfBranchAtNode = this.chanceOfBranchAtNode;
-        bg.maxBranchesAtNode = this.maxBranchesAtNode;
-        bg.branchScale = this.branchScale;
-        bg.branchLineWidthMult = this.branchLineWidthMult;
+        le.maxBranchCount = maxBranchCount;
+        le.chanceOfBranchAtNode = chanceOfBranchAtNode * chanceOfBranchScaleMult;
+        le.chanceOfBranchScaleMult = chanceOfBranchScaleMult;
+        le.minNodesBetweenBranching = minNodesBetweenBranching;
+        le.maxBranchesAtNode = maxBranchesAtNode;
+        le.branchLineWidthMult = branchLineWidthMult;
 
-        bg.maxBranchDepth = this.maxBranchDepth - 1;
+        le.maxBranchDepth = maxBranchDepth - 1;
 
-        bg.preFlashIntensity = this.preFlashIntensity * branchPreFlashIntensityMult;
-        bg.flashIntensity = this.preFlashIntensity * branchPreFlashIntensityMult;
-        bg.branchPreFlashIntensityMult = this.branchPreFlashIntensityMult;
-        bg.branchFlashIntensityMult = this.branchFlashIntensityMult;
+        le.preFlashIntensity = preFlashIntensity * branchPreFlashIntensityMult;
+        le.flashIntensity = preFlashIntensity * branchPreFlashIntensityMult;
+        le.branchPreFlashIntensityMult = branchPreFlashIntensityMult;
+        le.branchFlashIntensityMult = branchFlashIntensityMult;
 
-        bg.fadeSpeed = fadeSpeed;
-        bg.drawSpeed = drawSpeed;
+        le.fadeSpeed = fadeSpeed;
+        le.drawSpeed = drawSpeed;
 
-        bg.randomScaleOnMainPath = randomScaleOnMainPath * randomScaleBranchPath;
-        bg.randomScaleBranchPath = randomScaleBranchPath;
-        bg.isPerpetual = isPerpetual;
+        le.maxAngleDirectionChange = maxAngleDirectionChange;
+        le.randomnessWeight = randomnessWeight * randomnessWeightBranchMult;
+        le.randomnessWeightBranchMult = randomnessWeightBranchMult;
+        le.isPerpetual = isPerpetual;
 
         LineRenderer branchLine = branch.GetComponent<LineRenderer>();
         branchLine.widthMultiplier *= branchLineWidthMult;
@@ -237,22 +243,23 @@ public class LightningEffect : MonoBehaviour
 
 
     void DrawNode(int i, Vector3 node)
-        {
-            lr.positionCount = i + 1;
-            lr.SetPosition(i, node);
-        }
+    {
+        lr.positionCount = i + 1;
+        lr.SetPosition(i, node);
+    }
 
 
     void CalculateIfBranch(int i, Vector3 node)
+    {
+        if ((branchesRemaining > 0) && (i - pointOfLastBranch > minNodesBetweenBranching) && (Random.Range(0.0f, 1.0f) <= chanceOfBranchAtNode))
         {
-            if (branchesRemaining > 0 && Random.Range(0.0f, 1.0f) <= chanceOfBranchAtNode)
+            int numBranchesatPoint = Mathf.Min(branchesRemaining, Random.Range(1, maxBranchesAtNode));
+            for (int j = 0; j < numBranchesatPoint; j++)
             {
-                int numBranchesatPoint = Mathf.Min(branchesRemaining, Random.Range(1, maxBranchesAtNode));
-                for (int j = 0; j < numBranchesatPoint; j++)
-                {
-                    CreateBranch(i, node);
-                    branchesRemaining--;
-                }
+                CreateBranch(node);
+                branchesRemaining--;
             }
+            pointOfLastBranch = i;
         }
+    }
 }
