@@ -100,7 +100,7 @@ public class LightningEffect : MonoBehaviour
 
         if (currentStage == Stage.Grow)
         {
-            if(lr.GetPosition(nodePointer) == currentNode && nodePointer < nodeCount)
+            if(lr.GetPosition(nodePointer) == currentNode && nodePointer < nodeCount)//Only calculate new node when previous segment has finished animating
             {
                 nodePointer++;
                 if(nodePointer >= nodeCount)
@@ -134,9 +134,9 @@ public class LightningEffect : MonoBehaviour
 
         else if(currentStage == Stage.Flash)
         {
-            lightSource.intensity = flashIntensity;
+            lightSource.intensity = flashIntensity; //Set point light intensity
             timeSinceFlash = 0.0f;
-            lineMaterial.SetColor("_EmissionColor", emissionColor);
+            lineMaterial.SetColor("_EmissionColor", emissionColor); //Set line renderer's material emission colour
             if (!isPerpetual)
             {
                 currentStage = Stage.Fade;

@@ -64,7 +64,8 @@ MonoBehaviour:
   fadeSpeed: 10
   drawSpeed: 25
   randomScaleOnMainPath: 0.4
-  randomScaleOnBranches: 0.5
+  randomScaleBranchTarget: 0
+  randomScaleBranchPath: 0
   isPerpetual: 0
   lightningObj: {fileID: 8179025285748640803}
 --- !u!120 &8179025285748640802
