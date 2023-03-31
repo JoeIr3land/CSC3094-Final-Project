@@ -152,7 +152,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &954099030
 GameObject:
@@ -365,7 +365,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1798145427
 GameObject:
@@ -462,7 +462,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1896580795
 GameObject:
@@ -559,7 +559,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &2438151581965424365
 PrefabInstance:
@@ -619,16 +619,20 @@ PrefabInstance:
       objectReference: {fileID: 1754316207}
     - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
       propertyPath: drawSpeed
-      value: 1000
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
       propertyPath: fadeSpeed
-      value: 5
+      value: 2.5
       objectReference: {fileID: 0}
     - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
       propertyPath: nodeScale
       value: 0.1
       objectReference: {fileID: 0}
+    - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
+      propertyPath: sourceObj
+      value: 
+      objectReference: {fileID: 1754316207}
     - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
       propertyPath: startNode
       value: 
@@ -642,16 +646,24 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 736062345}
     - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
+      propertyPath: isPerpetual
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
+      propertyPath: segmentSize
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
       propertyPath: maxBranchCount
       value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
       propertyPath: maxBranchDepth
-      value: 5
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
       propertyPath: randomnessWeight
-      value: 0.7
+      value: 0.75
       objectReference: {fileID: 0}
     - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
       propertyPath: chanceOfBranchAtNode
@@ -666,12 +678,16 @@ PrefabInstance:
       value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
+      propertyPath: maxBranchesAtPosition
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
       propertyPath: randomScaleBranchPath
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
       propertyPath: chanceOfBranchScaleMult
-      value: 2
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
       propertyPath: maxAngleDirectionChange
@@ -682,12 +698,20 @@ PrefabInstance:
       value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
+      propertyPath: chanceOfBranchAtPosition
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
       propertyPath: minNodesBetweenBranching
       value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
       propertyPath: randomnessWeightBranchMult
       value: 1.01
+      objectReference: {fileID: 0}
+    - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
+      propertyPath: minSegmentsBetweenBranching
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 2438151582683850686, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
       propertyPath: m_Name
