@@ -5,20 +5,20 @@ using UnityEngine;
 public class LightningCreator : MonoBehaviour
 {
     [Header("Source/Target")]
-    [SerializeField] public GameObject startObj;
+    [SerializeField] public GameObject sourceObj;
     [SerializeField] public GameObject targetObj;
 
     [Header("Main Path")]
-    [SerializeField] public float nodeScale;
+    [SerializeField] public float segmentSize;
     [SerializeField] public float targetOuterThreshold;
     [SerializeField] public float targetInnerThreshold;
 
     [Header("Branches")]
     [SerializeField] public int maxBranchCount;
-    [SerializeField] public float chanceOfBranchAtNode;
+    [SerializeField] public float chanceOfBranchAtPosition;
     [SerializeField] public float chanceOfBranchScaleMult;
-    [SerializeField] public float minNodesBetweenBranching;
-    [SerializeField] public int maxBranchesAtNode;
+    [SerializeField] public float minSegmentsBetweenBranching;
+    [SerializeField] public int maxBranchesAtPosition;
     [SerializeField] public float branchLineWidthMult;
 
     [Header("Subbranches")]
@@ -61,7 +61,7 @@ public class LightningCreator : MonoBehaviour
     {
         if (Input.GetButtonDown("Fire1"))
         {
-            CreateLightningBolt(startObj, targetObj);
+            CreateLightningBolt(sourceObj, targetObj);
         }
     }
 
@@ -69,17 +69,17 @@ public class LightningCreator : MonoBehaviour
     {
         GameObject lightningBolt = Instantiate(lightningObj) as GameObject;
         LightningEffect le = lightningBolt.GetComponent<LightningEffect>();
-        le.startNode = start.transform.position;
-        le.targetNode = target.transform.position;
-        le.nodeScale = nodeScale;
+        le.sourcePos = start.transform.position;
+        le.targetPos = target.transform.position;
+        le.segmentSize = segmentSize;
         le.targetOuterThreshold = targetOuterThreshold;
         le.targetInnerThreshold = targetInnerThreshold;
 
         le.maxBranchCount = maxBranchCount;
-        le.chanceOfBranchAtNode = chanceOfBranchAtNode;
+        le.chanceOfBranchAtPosition = chanceOfBranchAtPosition;
         le.chanceOfBranchScaleMult = chanceOfBranchScaleMult;
-        le.minNodesBetweenBranching = minNodesBetweenBranching;
-        le.maxBranchesAtNode = maxBranchesAtNode;
+        le.minSegmentsBetweenBranching = minSegmentsBetweenBranching;
+        le.maxBranchesAtPosition = maxBranchesAtPosition;
         le.branchLineWidthMult = branchLineWidthMult;
 
         le.maxBranchDepth = maxBranchDepth;

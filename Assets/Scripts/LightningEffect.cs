@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class LightningEffect : LightningCreator
 {
-    public Vector3 startNode;
-    public Vector3 targetNode;
+    public Vector3 sourcePos;
+    public Vector3 targetPos;
     LightningEffect parentBranch;
 
     enum Stage
@@ -20,9 +20,9 @@ public class LightningEffect : LightningCreator
     LineRenderer lr;
     Material lineMaterial;
 
-    int nodePointer;
-    Vector3 currentNode;
-    float timeSinceNodeCreation;
+    int segmentPointer;
+    Vector3 currentSegmentPos;
+    float timeSinceSegmentCreation;
     
     int branchesRemaining;
     int pointOfLastBranch;
@@ -37,14 +37,14 @@ public class LightningEffect : LightningCreator
     {
 
         branchesRemaining = maxBranchCount;
-        nodePointer = 0;
-        currentNode = startNode;
-        timeSinceNodeCreation = 0.0f;
+        segmentPointer = 0;
+        currentSegmentPos = sourcePos;
+        timeSinceSegmentCreation = 0.0f;
 
         lr = GetComponent<LineRenderer>();
         lr.positionCount = 1;
         lineMaterial = lr.material;
-        lr.SetPosition(0, startNode);
+        lr.SetPosition(0, sourcePos);
 
         currentStage = Stage.Grow;
 
@@ -66,9 +66,9 @@ public class LightningEffect : LightningCreator
 
         if (currentStage == Stage.Grow)
         {
-            if (lr.GetPosition(nodePointer) == currentNode) //Only calculate new node when previous segment has finished animating
+            if (lr.GetPosition(segmentPointer) == currentSegmentPos) //Only calculate new node when previous segment has finished animating
             {
-                float distanceToTarget = Vector3.Distance(lr.GetPosition(nodePointer), targetNode);
+                float distanceToTarget = Vector3.Distance(lr.GetPosition(segmentPointer), targetPos);
                 if (distanceToTarget < targetInnerThreshold)
                 {
                     currentStage = Stage.Flash;
@@ -77,24 +77,24 @@ public class LightningEffect : LightningCreator
                 {
                     if (maxBranchDepth > 1)
                     {
-                        CalculateIfBranch(nodePointer, currentNode);
+                        CalculateIfBranch(segmentPointer, currentSegmentPos);
                     }
 
-                    nodePointer++;
-                    currentNode = GenerateNode(nodePointer);
+                    segmentPointer++;
+                    currentSegmentPos = GenerateSegment(segmentPointer);
 
                     lr.positionCount++;
-                    lr.SetPosition(nodePointer, lr.GetPosition(nodePointer - 1)); //Set position to beginning of new segment
+                    lr.SetPosition(segmentPointer, lr.GetPosition(segmentPointer - 1)); //Set position to beginning of new segment
 
-                    timeSinceNodeCreation = 0.0f;
+                    timeSinceSegmentCreation = 0.0f;
 
                 }
             }
             else
             {
-                timeSinceNodeCreation += Time.deltaTime;
-                Vector3 newLinePos = Vector3.Lerp(lr.GetPosition(nodePointer - 1), currentNode, timeSinceNodeCreation * drawSpeed);
-                lr.SetPosition(nodePointer, newLinePos);
+                timeSinceSegmentCreation += Time.deltaTime;
+                Vector3 newLinePos = Vector3.Lerp(lr.GetPosition(segmentPointer - 1), currentSegmentPos, timeSinceSegmentCreation * drawSpeed);
+                lr.SetPosition(segmentPointer, newLinePos);
                 transform.position = newLinePos;
             }
 
@@ -135,19 +135,19 @@ public class LightningEffect : LightningCreator
     }
 
 
-    Vector3 GenerateNode(int nodeNumber)
+    Vector3 GenerateSegment(int segmentNumber)
     {
-        Vector3 prevNode = lr.GetPosition(nodeNumber - 1);
-        float distanceToTarget = Vector3.Distance(prevNode, targetNode);
-        if (distanceToTarget < nodeScale) { return targetNode; } //If distance to target is less than the length of a node, then return the target node to prevent overshooting and circling back
+        Vector3 prevSegment = lr.GetPosition(segmentNumber - 1);
+        float distanceToTarget = Vector3.Distance(prevSegment, targetPos);
+        if (distanceToTarget < segmentSize) { return targetPos; } //If distance to target is less than the length of a node, then return the target node to prevent overshooting and circling back
 
         Vector3 directionPreviousSegment;
         Vector3 newDirection;
 
         //Direction to target
-        Vector3 directionToTarget = (targetNode - prevNode).normalized;
+        Vector3 directionToTarget = (targetPos - prevSegment).normalized;
         //Direction of previous segment (if first segment after start, then direction = direct vector)
-        if (nodeNumber > 1) { directionPreviousSegment = (prevNode - lr.GetPosition(nodeNumber - 2)).normalized; }
+        if (segmentNumber > 1) { directionPreviousSegment = (prevSegment - lr.GetPosition(segmentNumber - 2)).normalized; }
         else { directionPreviousSegment = directionToTarget; }
         //Random direction
         Vector3 directionRandom = new Vector3(Random.Range(-1.0f, 1.0f),
@@ -161,7 +161,7 @@ public class LightningEffect : LightningCreator
         float factor = maxAngleDirectionChange / angle;
         newDirection = Vector3.Slerp(directionPreviousSegment, newDirection, factor);
         //Calculate new node position
-        return prevNode + (newDirection * nodeScale);
+        return prevSegment + (newDirection * segmentSize);
     }
 
 
@@ -171,17 +171,17 @@ public class LightningEffect : LightningCreator
         LightningEffect le = branch.GetComponent<LightningEffect>();
         le.parentBranch = this;
 
-        le.startNode = branchPoint;
-        le.targetNode = targetNode;
-        le.nodeScale = nodeScale;
+        le.sourcePos = branchPoint;
+        le.targetPos = targetPos;
+        le.segmentSize = segmentSize;
         le.targetOuterThreshold = targetOuterThreshold;
         le.targetInnerThreshold = targetInnerThreshold;
 
         le.maxBranchCount = maxBranchCount;
-        le.chanceOfBranchAtNode = chanceOfBranchAtNode * chanceOfBranchScaleMult;
+        le.chanceOfBranchAtPosition = chanceOfBranchAtPosition * chanceOfBranchScaleMult;
         le.chanceOfBranchScaleMult = chanceOfBranchScaleMult;
-        le.minNodesBetweenBranching = minNodesBetweenBranching;
-        le.maxBranchesAtNode = maxBranchesAtNode;
+        le.minSegmentsBetweenBranching = minSegmentsBetweenBranching;
+        le.maxBranchesAtPosition = maxBranchesAtPosition;
         le.branchLineWidthMult = branchLineWidthMult;
 
         le.maxBranchDepth = maxBranchDepth - 1;
@@ -203,22 +203,14 @@ public class LightningEffect : LightningCreator
         branchLine.widthMultiplier *= branchLineWidthMult;
     }
 
-
-    void DrawNode(int i, Vector3 node)
+    void CalculateIfBranch(int i, Vector3 position)
     {
-        lr.positionCount = i + 1;
-        lr.SetPosition(i, node);
-    }
-
-
-    void CalculateIfBranch(int i, Vector3 node)
-    {
-        if ((branchesRemaining > 0) && (i - pointOfLastBranch > minNodesBetweenBranching) && (Random.Range(0.0f, 1.0f) <= chanceOfBranchAtNode))
+        if ((branchesRemaining > 0) && (i - pointOfLastBranch > minSegmentsBetweenBranching) && (Random.Range(0.0f, 1.0f) <= chanceOfBranchAtPosition))
         {
-            int numBranchesatPoint = Mathf.Min(branchesRemaining, Random.Range(1, maxBranchesAtNode));
+            int numBranchesatPoint = Mathf.Min(branchesRemaining, Random.Range(1, maxBranchesAtPosition));
             for (int j = 0; j < numBranchesatPoint; j++)
             {
-                CreateBranch(node);
+                CreateBranch(position);
                 branchesRemaining--;
             }
             pointOfLastBranch = i;
