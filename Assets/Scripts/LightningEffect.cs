@@ -32,7 +32,6 @@ public class LightningEffect : LightningCreator
     float timeSinceFlash;
 
 
-
     // Start is called before the first frame update
     void Start()
     {

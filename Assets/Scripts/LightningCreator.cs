@@ -33,6 +33,7 @@ public class LightningCreator : MonoBehaviour
     [Header("Line")]
     [SerializeField] public Color emissionColor;
     [SerializeField] public Color fadedEmissionColor;
+    [SerializeField] public float lineWidth;
 
     [Header("Animation")]
     [SerializeField] public float fadeSpeed;
@@ -100,6 +101,9 @@ public class LightningCreator : MonoBehaviour
         le.randomnessWeightBranchMult = randomnessWeightBranchMult;
 
         le.isPerpetual = isPerpetual;
+
+        LineRenderer lr = lightningBolt.GetComponent<LineRenderer>();
+        lr.widthMultiplier *= lineWidth;
 
     }
 }
