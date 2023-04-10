@@ -5,8 +5,8 @@ using UnityEngine;
 public class LightningCreator : MonoBehaviour
 {
     [Header("Source/Target")]
-    [SerializeField] public GameObject sourceObj;
-    [SerializeField] public GameObject targetObj;
+    [SerializeField] public Vector3 source;
+    [SerializeField] public Vector3 target;
 
     [Header("Main Path")]
     [SerializeField] public float segmentSize;
@@ -61,16 +61,16 @@ public class LightningCreator : MonoBehaviour
     {
         if (Input.GetButtonDown("Fire1"))
         {
-            CreateLightningBolt(sourceObj, targetObj);
+            CreateLightningBolt(source, target);
         }
     }
 
-    void CreateLightningBolt(GameObject start, GameObject target)
+    void CreateLightningBolt(Vector3 start, Vector3 target)
     {
         GameObject lightningBolt = Instantiate(lightningObj) as GameObject;
         LightningEffect le = lightningBolt.GetComponent<LightningEffect>();
-        le.sourcePos = start.transform.position;
-        le.targetPos = target.transform.position;
+        le.sourcePos = start;
+        le.targetPos = target;
         le.segmentSize = segmentSize;
         le.targetOuterThreshold = targetOuterThreshold;
         le.targetInnerThreshold = targetInnerThreshold;
