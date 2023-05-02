@@ -9,23 +9,23 @@ public class LightningEffect : LightningCreator
     LightningEffect parentBranch;
     public int pointOfDivergenceFromParent;
 
-    LineRenderer lr;
-    Material lineMaterial;
+    protected LineRenderer lr;
+    protected Material lineMaterial;
 
-    int segmentPointer;
-    Vector3 currentSegmentPos;
-    float error;
-    float timeSinceSegmentCreation;
+    protected int segmentPointer;
+    protected Vector3 currentSegmentPos;
+    protected float error;
+    protected float timeSinceSegmentCreation;
     
-    int branchesRemaining;
-    int pointOfLastBranch;
+    protected int branchesRemaining;
+    protected int pointOfLastBranch;
 
-    Light lightSource;
-    float timeSinceFlash;
-    int numFlashesCompleted;
+    protected Light lightSource;
+    protected float timeSinceFlash;
+    protected int numFlashesCompleted;
 
 
-    enum Stage
+    protected enum Stage
     {
         SteppedLeaderGrow,
         SteppedLeaderFlash,
@@ -34,7 +34,7 @@ public class LightningEffect : LightningCreator
         DartLeaderFade,
         Ended
     }
-    Stage currentStage;
+    protected Stage currentStage;
 
 
     // Start is called before the first frame update
@@ -62,7 +62,7 @@ public class LightningEffect : LightningCreator
     // Update is called once per frame
     void Update()
     {
-        if (parentBranch & currentStage == Stage.SteppedLeaderGrow) //If this instance is a branch of a bigger lightning section, then stop growing when parent reaches destination
+        if (parentBranch && currentStage == Stage.SteppedLeaderGrow) //If this instance is a branch of a bigger lightning section, then stop growing when parent reaches destination
         {
             if (parentBranch.currentStage != Stage.SteppedLeaderGrow)
             {
@@ -77,88 +77,27 @@ public class LightningEffect : LightningCreator
 
         else if (currentStage == Stage.SteppedLeaderFlash)
         {
-            if (parentBranch)//Makes whole structure flash if sub-branch reaches target first
-            {
-                if (parentBranch.currentStage == Stage.SteppedLeaderGrow) { parentBranch.currentStage = Stage.SteppedLeaderFlash; }
-            }
-            lightSource.intensity = flashIntensity; //Set point light intensity
-            timeSinceFlash = 0.0f;
-            lineMaterial.SetColor("_EmissionColor", emissionColor); //Set line renderer's material emission colour
-            if (!isPerpetual)
-            {
-                currentStage = Stage.SteppedLeaderFade;
-            }
+            SteppedLeaderFlash();
         }
 
         else if (currentStage == Stage.SteppedLeaderFade)
         {
-            timeSinceFlash += Time.deltaTime;
-            if (lightSource.intensity > 0)
-            {
-                lightSource.intensity = Mathf.Lerp(flashIntensity, 0, timeSinceFlash * fadeSpeed);
-                lineMaterial.SetColor("_EmissionColor", Color.Lerp(emissionColor, fadedEmissionColor, timeSinceFlash * fadeSpeed));
-            }
-            else
-            {
-                currentStage = Stage.Ended;
-            }
+            SteppedLeaderFade();
         }
 
         else if (currentStage == Stage.DartLeaderFlash)
         {
-            if(numFlashesCompleted == 0)
-            {
-                if (parentBranch) //Makes whole structure flash if sub-branch reaches target first, and make sure whole path flashes properly
-                {
-                    parentBranch.currentStage = Stage.SteppedLeaderFlash;
-                    CalculateDartLeaderPath();
-                }
-                lr.widthMultiplier = dartLeaderLineWidth;
-            }
-            lightSource.intensity = flashIntensity;
-            timeSinceFlash = 0.0f;
-            lineMaterial.SetColor("_EmissionColor", emissionColor); //Set line renderer's material emission colour
-            numFlashesCompleted++;
-            if (!isPerpetual)
-            {
-                currentStage = Stage.DartLeaderFade;
-            }
+            DartLeaderFlash();
         }
 
         else if (currentStage == Stage.DartLeaderFade)
         {
-            timeSinceFlash += Time.deltaTime;
-            if(numFlashesCompleted < numReturnStrokes)
-            {
-                if(lightSource.intensity > 0)
-                {
-                    lightSource.intensity = Mathf.Lerp(flashIntensity, 0, timeSinceFlash * returnStrokeSpeed);
-                    lineMaterial.SetColor("_EmissionColor", Color.Lerp(emissionColor, fadedEmissionColor, timeSinceFlash * returnStrokeSpeed));
-                }
-                else
-                {
-                    currentStage = Stage.DartLeaderFlash;
-                }
-            }
-            else
-            {
-                if (lightSource.intensity > 0)
-                {
-                    lightSource.intensity = Mathf.Lerp(flashIntensity, 0, timeSinceFlash * dartLeaderFadeSpeed);
-                    lineMaterial.SetColor("_EmissionColor", Color.Lerp(emissionColor, fadedEmissionColor, timeSinceFlash * dartLeaderFadeSpeed));
-                }
-                else
-                {
-                    currentStage = Stage.Ended;
-                }
-            }
-
+            DartLeaderFade();
         }
 
         else if (currentStage == Stage.Ended)
         {
-            Destroy(lineMaterial);
-            Destroy(gameObject);
+            End();
         }
 
     }
@@ -221,6 +160,96 @@ public class LightningEffect : LightningCreator
 
             }
         }
+    }
+
+
+    void SteppedLeaderFlash()
+    {
+        if (parentBranch)//Makes whole structure flash if sub-branch reaches target first
+        {
+            if (parentBranch.currentStage == Stage.SteppedLeaderGrow) { parentBranch.currentStage = Stage.SteppedLeaderFlash; }
+        }
+        lightSource.intensity = flashIntensity; //Set point light intensity
+        timeSinceFlash = 0.0f;
+        lineMaterial.SetColor("_EmissionColor", emissionColor); //Set line renderer's material emission colour
+        if (!isPerpetual)
+        {
+            currentStage = Stage.SteppedLeaderFade;
+        }
+    }
+
+
+    void SteppedLeaderFade()
+    {
+        timeSinceFlash += Time.deltaTime;
+        if (lightSource.intensity > 0)
+        {
+            lightSource.intensity = Mathf.Lerp(flashIntensity, 0, timeSinceFlash * fadeSpeed);
+            lineMaterial.SetColor("_EmissionColor", Color.Lerp(emissionColor, fadedEmissionColor, timeSinceFlash * fadeSpeed));
+        }
+        else
+        {
+            currentStage = Stage.Ended;
+        }
+    }
+
+    void DartLeaderFlash()
+    {
+        if (numFlashesCompleted == 0)
+        {
+            if (parentBranch) //Makes whole structure flash if sub-branch reaches target first, and make sure whole path flashes properly
+            {
+                parentBranch.currentStage = Stage.SteppedLeaderFlash;
+                CalculateDartLeaderPath();
+            }
+            lr.widthMultiplier = dartLeaderLineWidth;
+        }
+        lightSource.intensity = flashIntensity;
+        timeSinceFlash = 0.0f;
+        lineMaterial.SetColor("_EmissionColor", emissionColor); //Set line renderer's material emission colour
+        numFlashesCompleted++;
+        if (!isPerpetual)
+        {
+            currentStage = Stage.DartLeaderFade;
+        }
+    }
+
+
+    void DartLeaderFade()
+    {
+        timeSinceFlash += Time.deltaTime;
+        if (numFlashesCompleted < numReturnStrokes)
+        {
+            if (lightSource.intensity > 0)
+            {
+                lightSource.intensity = Mathf.Lerp(flashIntensity, 0, timeSinceFlash * returnStrokeSpeed);
+                lineMaterial.SetColor("_EmissionColor", Color.Lerp(emissionColor, fadedEmissionColor, timeSinceFlash * returnStrokeSpeed));
+            }
+            else
+            {
+                currentStage = Stage.DartLeaderFlash;
+            }
+        }
+        else
+        {
+            if (lightSource.intensity > 0)
+            {
+                lightSource.intensity = Mathf.Lerp(flashIntensity, 0, timeSinceFlash * dartLeaderFadeSpeed);
+                lineMaterial.SetColor("_EmissionColor", Color.Lerp(emissionColor, fadedEmissionColor, timeSinceFlash * dartLeaderFadeSpeed));
+            }
+            else
+            {
+                currentStage = Stage.Ended;
+            }
+        }
+
+    }
+
+
+    void End()
+    {
+        Destroy(lineMaterial);
+        Destroy(gameObject);
     }
 
 
