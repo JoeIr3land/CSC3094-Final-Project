@@ -6,7 +6,7 @@ public class LightningEffect : LightningCreator
 {
     public Vector3 sourcePos;
     public Vector3 targetPos;
-    LightningEffect parentBranch;
+    public LightningEffect parentBranch;
     public int pointOfDivergenceFromParent;
 
     protected LineRenderer lr;
@@ -25,7 +25,7 @@ public class LightningEffect : LightningCreator
     protected int numFlashesCompleted;
 
 
-    protected enum Stage
+    public enum Stage
     {
         SteppedLeaderGrow,
         SteppedLeaderFlash,
@@ -34,7 +34,7 @@ public class LightningEffect : LightningCreator
         DartLeaderFade,
         Ended
     }
-    protected Stage currentStage;
+    public Stage currentStage;
 
 
     // Start is called before the first frame update
@@ -99,11 +99,10 @@ public class LightningEffect : LightningCreator
         {
             End();
         }
-
     }
 
 
-    void Grow()
+    protected void Grow()
     {
         float distanceTravelled = Time.deltaTime * drawSpeed;
         if(distanceTravelled < segmentSize) //If distance travelled in a frame is less than the length of a segment, smoothly animate segment growth
@@ -163,7 +162,7 @@ public class LightningEffect : LightningCreator
     }
 
 
-    void SteppedLeaderFlash()
+    protected void SteppedLeaderFlash()
     {
         if (parentBranch)//Makes whole structure flash if sub-branch reaches target first
         {
@@ -179,7 +178,7 @@ public class LightningEffect : LightningCreator
     }
 
 
-    void SteppedLeaderFade()
+    protected void SteppedLeaderFade()
     {
         timeSinceFlash += Time.deltaTime;
         if (lightSource.intensity > 0)
@@ -193,7 +192,7 @@ public class LightningEffect : LightningCreator
         }
     }
 
-    void DartLeaderFlash()
+    protected void DartLeaderFlash()
     {
         if (numFlashesCompleted == 0)
         {
@@ -215,7 +214,7 @@ public class LightningEffect : LightningCreator
     }
 
 
-    void DartLeaderFade()
+    protected void DartLeaderFade()
     {
         timeSinceFlash += Time.deltaTime;
         if (numFlashesCompleted < numReturnStrokes)
@@ -246,14 +245,14 @@ public class LightningEffect : LightningCreator
     }
 
 
-    void End()
+    protected void End()
     {
         Destroy(lineMaterial);
         Destroy(gameObject);
     }
 
 
-    void CalculateDartLeaderPath()
+    protected void CalculateDartLeaderPath()
     {
         //Get segment positions from parent branch(es) and add to this instance's line renderer
         bool atMasterBranch = false;
@@ -287,7 +286,7 @@ public class LightningEffect : LightningCreator
     }
 
 
-    void MoveLinePos()
+    protected void MoveLinePos()
     {
         timeSinceSegmentCreation += Time.deltaTime;
         Vector3 newLinePos = Vector3.Lerp(lr.GetPosition(segmentPointer - 1), currentSegmentPos, (timeSinceSegmentCreation * drawSpeed) / segmentSize);
@@ -296,13 +295,13 @@ public class LightningEffect : LightningCreator
     }
 
 
-    bool CheckDistanceToTarget()
+    protected bool CheckDistanceToTarget()
     {
         return Vector3.Distance(lr.GetPosition(segmentPointer), targetPos) < targetInnerThreshold;
     }
 
 
-    Vector3 GenerateSegment(int segmentNumber)
+    protected Vector3 GenerateSegment(int segmentNumber)
     {
         Vector3 prevSegment = lr.GetPosition(segmentNumber - 1);
         float distanceToTarget = Vector3.Distance(prevSegment, targetPos);
@@ -332,7 +331,22 @@ public class LightningEffect : LightningCreator
     }
 
 
-    void CreateBranch(int pointOfDivergence, Vector3 branchPoint)
+    protected void CalculateIfBranch(int i, Vector3 position)
+    {
+        if ((branchesRemaining > 0) && (i - pointOfLastBranch > minSegmentsBetweenBranching) && (Random.Range(0.0f, 1.0f) <= chanceOfBranchAtPosition))
+        {
+            int numBranchesatPoint = Mathf.Min(branchesRemaining, Random.Range(1, maxBranchesAtPosition));
+            for (int j = 0; j < numBranchesatPoint; j++)
+            {
+                CreateBranch(i, position);
+                branchesRemaining--;
+            }
+            pointOfLastBranch = i;
+        }
+    }
+
+
+    protected void CreateBranch(int pointOfDivergence, Vector3 branchPoint)
     {
         GameObject branch = Instantiate(lightningObj) as GameObject;
         LightningEffect le = branch.GetComponent<LightningEffect>();
@@ -345,7 +359,7 @@ public class LightningEffect : LightningCreator
         le.targetOuterThreshold = targetOuterThreshold;
         le.targetInnerThreshold = targetInnerThreshold;
 
-        le.maxBranchCount = maxBranchCount;
+        le.maxBranchCount = branchesRemaining;
         le.chanceOfBranchAtPosition = chanceOfBranchAtPosition * chanceOfBranchScaleMult;
         le.chanceOfBranchScaleMult = chanceOfBranchScaleMult;
         le.minSegmentsBetweenBranching = minSegmentsBetweenBranching;
@@ -377,17 +391,4 @@ public class LightningEffect : LightningCreator
     }
 
 
-    void CalculateIfBranch(int i, Vector3 position)
-    {
-        if ((branchesRemaining > 0) && (i - pointOfLastBranch > minSegmentsBetweenBranching) && (Random.Range(0.0f, 1.0f) <= chanceOfBranchAtPosition))
-        {
-            int numBranchesatPoint = Mathf.Min(branchesRemaining, Random.Range(1, maxBranchesAtPosition));
-            for (int j = 0; j < numBranchesatPoint; j++)
-            {
-                CreateBranch(i, position);
-                branchesRemaining--;
-            }
-            pointOfLastBranch = i;
-        }
-    }
 }

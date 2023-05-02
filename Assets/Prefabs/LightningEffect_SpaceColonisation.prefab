@@ -32,7 +32,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!120 &8179025285748640802
 LineRenderer:
@@ -209,3 +209,43 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 74921276847889544a395ece259ac943, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  source: {x: 0, y: 0, z: 0}
+  target: {x: 0, y: 0, z: 0}
+  segmentSize: 0
+  targetOuterThreshold: 0
+  targetInnerThreshold: 0
+  maxBranchCount: 0
+  chanceOfBranchAtPosition: 0
+  chanceOfBranchScaleMult: 0
+  minSegmentsBetweenBranching: 0
+  maxBranchesAtPosition: 0
+  branchLineWidthMult: 0
+  maxBranchDepth: 0
+  preFlashIntensity: 0
+  flashIntensity: 0
+  branchPreFlashIntensityMult: 0
+  branchFlashIntensityMult: 0
+  emissionColor: {r: 0, g: 0, b: 0, a: 0}
+  fadedEmissionColor: {r: 0, g: 0, b: 0, a: 0}
+  lineWidth: 0
+  dartLeaderLineWidth: 0
+  fadeSpeed: 0
+  drawSpeed: 0
+  numReturnStrokes: 0
+  returnStrokeSpeed: 0
+  dartLeaderFadeSpeed: 0
+  maxAngleDirectionChange: 0
+  randomnessWeight: 0
+  randomnessWeightBranchMult: 0
+  isPerpetual: 0
+  lightningObj: {fileID: 8179025285748640803}
+  attractorObj: {fileID: 0}
+  num_attractors: 0
+  attractorInfluenceWeight: 0
+  attractorOuterBound: 0
+  attractorInnerBound: 0
+  sourcePos: {x: 0, y: 0, z: 0}
+  targetPos: {x: 0, y: 0, z: 0}
+  parentBranch: {fileID: 0}
+  pointOfDivergenceFromParent: 0
+  currentStage: 0

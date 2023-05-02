@@ -4,9 +4,8 @@ using UnityEngine;
 
 public class LE_SpaceColonisation : LightningEffect
 {
-
-    Vector3 prevSegmentPos;
-    List<Vector3> attractors;
+    GameObject attractors;
+    Attractors att;
 
 
     // Start is called before the first frame update
@@ -16,7 +15,6 @@ public class LE_SpaceColonisation : LightningEffect
         branchesRemaining = maxBranchCount;
         currentStage = Stage.SteppedLeaderGrow;
         currentSegmentPos = sourcePos;
-        prevSegmentPos = sourcePos;
         segmentPointer = 0;
         error = 0.0f;
 
@@ -30,22 +28,235 @@ public class LE_SpaceColonisation : LightningEffect
         lineMaterial = lr.material;
         lr.SetPosition(0, sourcePos);
 
+        att = attractorObj.GetComponent<Attractors>();
     }
 
-    /*
+    // Update is called once per frame
+    void Update()
+    {
+        if (parentBranch && currentStage == Stage.SteppedLeaderGrow) //If this instance is a branch of a bigger lightning section, then stop growing when parent reaches destination
+        {
+            if (parentBranch.currentStage != Stage.SteppedLeaderGrow)
+            {
+                currentStage = Stage.SteppedLeaderFlash;
+            }
+        }
+
+        if (currentStage == Stage.SteppedLeaderGrow)
+        {
+            Grow();
+        }
+
+        else if (currentStage == Stage.SteppedLeaderFlash)
+        {
+            SteppedLeaderFlash();
+        }
+
+        else if (currentStage == Stage.SteppedLeaderFade)
+        {
+            SteppedLeaderFade();
+        }
+
+        else if (currentStage == Stage.DartLeaderFlash)
+        {
+            DartLeaderFlash();
+        }
+
+        else if (currentStage == Stage.DartLeaderFade)
+        {
+            DartLeaderFade();
+        }
+
+        else if (currentStage == Stage.Ended)
+        {
+            End();
+        }
+    }
+
+    void Grow()
+    {
+        float distanceTravelled = Time.deltaTime * drawSpeed;
+        if (distanceTravelled < segmentSize) //If distance travelled in a frame is less than the length of a segment, smoothly animate segment growth
+        {
+            if (lr.GetPosition(segmentPointer) == currentSegmentPos) //Calculate new segment when previous segment finishes animating
+            {
+                if (CheckDistanceToTarget())
+                {
+                    currentStage = Stage.SteppedLeaderFlash;
+                }
+                else //First create the next point on the path, then check if branching can occur at previous segment
+                {
+                    segmentPointer++;
+                    currentSegmentPos = GenerateSegment(segmentPointer);
+
+                    if (maxBranchDepth > 1)
+                    {
+                        CalculateIfBranch(segmentPointer - 1, lr.GetPosition(segmentPointer - 1));
+                    }
+
+                    lr.positionCount++;
+                    lr.SetPosition(segmentPointer, lr.GetPosition(segmentPointer - 1)); //Set position to beginning of new segment
+                    timeSinceSegmentCreation = 0.0f;
+                }
+            }
+            else
+            {
+                MoveLinePos();
+            }
+        }
+        else //If distance travelled in a frame is more than the length of one segment, then generate and render segments in their entirety (>1 per frame if needed)
+        {
+            error += distanceTravelled;
+            while (error >= 0.5f)
+            {
+                segmentPointer++;
+                currentSegmentPos = GenerateSegment(segmentPointer);
+
+                if (maxBranchDepth > 1)
+                {
+                    CalculateIfBranch(segmentPointer - 1, lr.GetPosition(segmentPointer - 1));
+                }
+
+                lr.positionCount++;
+                lr.SetPosition(segmentPointer, currentSegmentPos); //Set position to end of new segment
+                transform.position = currentSegmentPos;
+                error--;
+
+                if (CheckDistanceToTarget())
+                {
+                    currentStage = Stage.DartLeaderFlash;
+                    error = 0.0f;
+                }
+
+            }
+        }
+    }
+
+    void End()
+    {
+        Destroy(lineMaterial);
+        Destroy(attractorObj);
+        Destroy(gameObject);
+    }
+
+
     Vector3 GenerateSegment(int segmentNumber)
     {
-        float distanceToTarget = Vector3.Distance(prevSegmentPos, targetPos);
+        Vector3 prevSegment = lr.GetPosition(segmentNumber - 1);
+        float distanceToTarget = Vector3.Distance(prevSegment, targetPos);
         if (distanceToTarget < segmentSize) { return targetPos; } //If distance to target is less than the length of a node, then return the target node to prevent overshooting and circling back
 
+        //Direction to target
+        Vector3 directionToTarget = (targetPos - prevSegment).normalized;
+        Debug.Log("Direction to target");
+        Debug.Log(directionToTarget);
+
         Vector3 directionPreviousSegment;
-        List<Vector3> directionsToAttractors;
+        List<Vector3> attractorsInRange;
+        Vector3 directionToAttractors;
         Vector3 newDirection;
 
-        //Direction to target
-        Vector3 directionToTarget = (targetPos - prevSegmentPos).normalized;
         //Direction of previous segment (if first segment after start, then direction = direct vector)
-        if (segmentNumber > 1) { directionPreviousSegment = (prevSegmentPos - lr.GetPosition(segmentNumber - 2)).normalized; }
+        if (segmentNumber > 1) { directionPreviousSegment = (prevSegment - lr.GetPosition(segmentNumber - 2)).normalized; }
         else { directionPreviousSegment = directionToTarget; }
-    }*/
+
+        //Direction towards attractors in range
+        attractorsInRange = att.GetAttractorsInRange(prevSegment, attractorOuterBound);
+        if (attractorsInRange.Count == 0) 
+        {
+            directionToAttractors = directionPreviousSegment;//If no attractors remaining, keep going in straight line
+        }
+        else
+        {
+            directionToAttractors = (attractorsInRange[0] - prevSegment).normalized;
+            for (int i = 1; i < attractorsInRange.Count; i++)
+            {
+                directionToAttractors += (attractorsInRange[i] - prevSegment); //Add directions from prev segment towards each attractor together
+            }
+            directionToAttractors = directionToAttractors.normalized;
+        }
+        Debug.Log("Direction to attractors");
+        Debug.Log(directionToAttractors);
+
+        //Interpolate direction between moving directly to target, and moving towards attractors (when near target, move directly to target)
+        if(distanceToTarget > targetOuterThreshold) 
+        { 
+            newDirection = (Vector3.Lerp(directionToTarget, directionToAttractors, attractorInfluenceWeight)).normalized;
+        }
+        else { newDirection = directionToTarget; }
+
+        //Calculate new node position
+        Vector3 newPosition = prevSegment + (newDirection * segmentSize);
+
+        Debug.Log("new direction");
+        Debug.Log(newDirection);
+        Debug.Log("new position");
+        Debug.Log(newPosition);
+
+        return newPosition;
+    }
+
+
+    void CalculateIfBranch(int i, Vector3 position)
+    {
+        bool deletionOccurred = att.KillAttractorsInRange(currentSegmentPos, attractorInnerBound);
+        if ((branchesRemaining > 0) && deletionOccurred && (i - pointOfLastBranch > minSegmentsBetweenBranching) && att.GetAttractorsInRange(position, attractorOuterBound).Count > 0)
+        {
+            branchesRemaining--;
+            CreateBranch(i, position);
+            pointOfLastBranch = i;
+        }
+    }
+
+
+    void CreateBranch(int pointOfDivergence, Vector3 branchPoint)
+    {
+        GameObject branch = Instantiate(lightningObj) as GameObject;
+        LE_SpaceColonisation le = branch.GetComponent<LE_SpaceColonisation>();
+        le.parentBranch = this;
+        le.pointOfDivergenceFromParent = pointOfDivergence;
+
+        le.sourcePos = branchPoint;
+        le.targetPos = targetPos;
+        le.segmentSize = segmentSize;
+        le.targetOuterThreshold = targetOuterThreshold;
+        le.targetInnerThreshold = targetInnerThreshold;
+
+        le.maxBranchCount = branchesRemaining;
+        le.chanceOfBranchAtPosition = chanceOfBranchAtPosition * chanceOfBranchScaleMult;
+        le.chanceOfBranchScaleMult = chanceOfBranchScaleMult;
+        le.minSegmentsBetweenBranching = minSegmentsBetweenBranching;
+        le.maxBranchesAtPosition = maxBranchesAtPosition;
+        le.branchLineWidthMult = branchLineWidthMult;
+
+        le.maxBranchDepth = maxBranchDepth - 1;
+
+        le.preFlashIntensity = preFlashIntensity * branchPreFlashIntensityMult;
+        le.flashIntensity = flashIntensity * branchPreFlashIntensityMult;
+        le.branchPreFlashIntensityMult = branchPreFlashIntensityMult;
+        le.branchFlashIntensityMult = branchFlashIntensityMult;
+
+        le.emissionColor = emissionColor;
+        le.fadedEmissionColor = fadedEmissionColor;
+        le.lineWidth = lineWidth * branchLineWidthMult;
+        le.dartLeaderLineWidth = dartLeaderLineWidth;
+
+        le.fadeSpeed = fadeSpeed;
+        le.drawSpeed = drawSpeed;
+        le.numReturnStrokes = numReturnStrokes;
+        le.returnStrokeSpeed = returnStrokeSpeed;
+        le.dartLeaderFadeSpeed = dartLeaderFadeSpeed;
+
+        le.maxAngleDirectionChange = maxAngleDirectionChange;
+        le.randomnessWeight = randomnessWeight * randomnessWeightBranchMult;
+        le.randomnessWeightBranchMult = randomnessWeightBranchMult;
+
+        le.isPerpetual = isPerpetual;
+
+        le.attractorOuterBound = attractorOuterBound;
+        le.attractorInnerBound = attractorInnerBound;
+        le.attractorObj = attractorObj;
+        le.attractorInfluenceWeight = attractorInfluenceWeight;
+    }
+
 }

@@ -172,6 +172,241 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &897912208
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 2
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 2438151582683850680, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
+      propertyPath: m_RootOrder
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2438151582683850680, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2438151582683850680, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2438151582683850680, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2438151582683850680, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2438151582683850680, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2438151582683850680, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2438151582683850680, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2438151582683850680, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2438151582683850680, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2438151582683850680, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
+      propertyPath: source.x
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
+      propertyPath: source.y
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
+      propertyPath: source.z
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
+      propertyPath: startObj
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
+      propertyPath: target.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
+      propertyPath: target.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
+      propertyPath: target.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
+      propertyPath: drawSpeed
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
+      propertyPath: fadeSpeed
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
+      propertyPath: lineWidth
+      value: 0.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
+      propertyPath: nodeScale
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
+      propertyPath: sourceObj
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
+      propertyPath: startNode
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
+      propertyPath: targetObj
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
+      propertyPath: targetNode
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
+      propertyPath: isPerpetual
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
+      propertyPath: segmentSize
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
+      propertyPath: attractorObj
+      value: 
+      objectReference: {fileID: 2357288359172041198, guid: 9ac7a1b2834e336469dd7bcd82742894, type: 3}
+    - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
+      propertyPath: lightningObj
+      value: 
+      objectReference: {fileID: 8179025285748640803, guid: aab4c0e0d5c27794888efc14b2b78d3a, type: 3}
+    - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
+      propertyPath: maxBranchCount
+      value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
+      propertyPath: maxBranchDepth
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
+      propertyPath: num_attractors
+      value: 50000
+      objectReference: {fileID: 0}
+    - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
+      propertyPath: numReturnStrokes
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
+      propertyPath: randomnessWeight
+      value: 0.75
+      objectReference: {fileID: 0}
+    - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
+      propertyPath: returnStrokeSpeed
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
+      propertyPath: attractorInnerBound
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
+      propertyPath: attractorOuterBound
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
+      propertyPath: branchLineWidthMult
+      value: 0.6
+      objectReference: {fileID: 0}
+    - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
+      propertyPath: dartLeaderFadeSpeed
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
+      propertyPath: dartLeaderLineWidth
+      value: 0.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
+      propertyPath: chanceOfBranchAtNode
+      value: 0.05
+      objectReference: {fileID: 0}
+    - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
+      propertyPath: targetInnerThreshold
+      value: 0.01
+      objectReference: {fileID: 0}
+    - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
+      propertyPath: targetOuterThreshold
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
+      propertyPath: maxBranchesAtPosition
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
+      propertyPath: randomScaleBranchPath
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
+      propertyPath: chanceOfBranchScaleMult
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
+      propertyPath: maxAngleDirectionChange
+      value: 30
+      objectReference: {fileID: 0}
+    - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
+      propertyPath: randomScaleBranchTarget
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
+      propertyPath: attractorInfluenceWeight
+      value: 0.42
+      objectReference: {fileID: 0}
+    - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
+      propertyPath: chanceOfBranchAtPosition
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
+      propertyPath: minNodesBetweenBranching
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
+      propertyPath: randomnessWeightBranchMult
+      value: 1.01
+      objectReference: {fileID: 0}
+    - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
+      propertyPath: minSegmentsBetweenBranching
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 2438151582683850686, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
+      propertyPath: m_Name
+      value: LightningCreator (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 2438151582683850686, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_AddedGameObjects: []
+  m_SourcePrefab: {fileID: 100100000, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
 --- !u!1 &954099030
 GameObject:
   m_ObjectHideFlags: 0
@@ -671,6 +906,10 @@ PrefabInstance:
       value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
+      propertyPath: attractorObj
+      value: 
+      objectReference: {fileID: 2357288359172041198, guid: 9ac7a1b2834e336469dd7bcd82742894, type: 3}
+    - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
       propertyPath: maxBranchCount
       value: 50
       objectReference: {fileID: 0}
@@ -756,7 +995,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2438151582683850686, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_AddedGameObjects: []
