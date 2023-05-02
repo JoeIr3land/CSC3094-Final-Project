@@ -619,6 +619,18 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 0}
     - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
+      propertyPath: target.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
+      propertyPath: target.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
+      propertyPath: target.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
       propertyPath: drawSpeed
       value: 1000
       objectReference: {fileID: 0}
@@ -660,7 +672,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
       propertyPath: maxBranchCount
-      value: 100
+      value: 50
       objectReference: {fileID: 0}
     - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
       propertyPath: maxBranchDepth
