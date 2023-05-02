@@ -54,6 +54,12 @@ public class LightningCreator : MonoBehaviour
     [Header("Lightning Effect Type")]
     [SerializeField] protected GameObject lightningObj;
 
+    [Header("Space Colonisation Parameters")]
+    [SerializeField] public int num_attractors;
+    [SerializeField] float maxAttractorDistance;
+    [SerializeField] float attractorOuterBound;
+    [SerializeField] float attractorInnerBound;
+
 
     // Start is called before the first frame update
     void Start()
@@ -111,6 +117,9 @@ public class LightningCreator : MonoBehaviour
         le.randomnessWeightBranchMult = randomnessWeightBranchMult;
 
         le.isPerpetual = isPerpetual;
+
+        le.num_attractors = (int)((float)num_attractors * scaleModifier);
+        le.maxAttractorDistance = maxAttractorDistance * scaleModifier;
 
     }
 }
