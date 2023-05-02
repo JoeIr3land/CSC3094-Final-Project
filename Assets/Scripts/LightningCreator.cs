@@ -72,15 +72,16 @@ public class LightningCreator : MonoBehaviour
 
     void CreateLightningBolt(Vector3 start, Vector3 target)
     {
+        float scaleModifier = (start - target).magnitude / 8.660f; //Create more consistent results with different lightning bolt sizes
         GameObject lightningBolt = Instantiate(lightningObj) as GameObject;
         LightningEffect le = lightningBolt.GetComponent<LightningEffect>();
         le.sourcePos = start;
         le.targetPos = target;
-        le.segmentSize = segmentSize;
-        le.targetOuterThreshold = targetOuterThreshold;
-        le.targetInnerThreshold = targetInnerThreshold;
+        le.segmentSize = segmentSize * scaleModifier;
+        le.targetOuterThreshold = targetOuterThreshold * scaleModifier;
+        le.targetInnerThreshold = targetInnerThreshold * scaleModifier;
 
-        le.maxBranchCount = maxBranchCount;
+        le.maxBranchCount = (int)((float)maxBranchCount * scaleModifier);
         le.chanceOfBranchAtPosition = chanceOfBranchAtPosition;
         le.chanceOfBranchScaleMult = chanceOfBranchScaleMult;
         le.minSegmentsBetweenBranching = minSegmentsBetweenBranching;
@@ -96,7 +97,8 @@ public class LightningCreator : MonoBehaviour
 
         le.emissionColor = emissionColor;
         le.fadedEmissionColor = fadedEmissionColor;
-        le.dartLeaderLineWidth = dartLeaderLineWidth;
+        le.lineWidth = lineWidth * scaleModifier ;
+        le.dartLeaderLineWidth = dartLeaderLineWidth * scaleModifier;
 
         le.fadeSpeed = fadeSpeed;
         le.drawSpeed = drawSpeed;
@@ -109,9 +111,6 @@ public class LightningCreator : MonoBehaviour
         le.randomnessWeightBranchMult = randomnessWeightBranchMult;
 
         le.isPerpetual = isPerpetual;
-
-        LineRenderer lr = lightningBolt.GetComponent<LineRenderer>();
-        lr.widthMultiplier = lineWidth;
 
     }
 }
