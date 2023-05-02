@@ -40,7 +40,6 @@ public class CameraMovement : MonoBehaviour
         yRotation -= mouseInputY;
         transform.rotation = Quaternion.Euler(0, xRotation, 0);
         cam.transform.rotation = Quaternion.Euler(yRotation, xRotation, 0);
-        
 
 
     }
