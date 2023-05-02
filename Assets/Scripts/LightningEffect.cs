@@ -52,6 +52,7 @@ public class LightningEffect : LightningCreator
 
         lr = GetComponent<LineRenderer>();
         lr.positionCount = 1;
+        lr.widthMultiplier = lineWidth;
         lineMaterial = lr.material;
         lr.SetPosition(0, sourcePos);
     }
@@ -115,9 +116,9 @@ public class LightningEffect : LightningCreator
             lightSource.intensity = flashIntensity;
             timeSinceFlash = 0.0f;
             lineMaterial.SetColor("_EmissionColor", emissionColor); //Set line renderer's material emission colour
+            numFlashesCompleted++;
             if (!isPerpetual)
             {
-                numFlashesCompleted++;
                 currentStage = Stage.DartLeaderFade;
             }
         }
@@ -238,7 +239,7 @@ public class LightningEffect : LightningCreator
                 currentBranch = currentBranch.parentBranch;
                 //Shift all linerenderer positions upwards
                 int oldPositionCount = lr.positionCount;
-                lr.positionCount += currentBranchPoint + 1;
+                lr.positionCount += currentBranchPoint;
                 for(int i=oldPositionCount-1; i>0; i--)
                 {
                     lr.SetPosition(i + currentBranchPoint, lr.GetPosition(i));
@@ -324,6 +325,11 @@ public class LightningEffect : LightningCreator
         le.branchPreFlashIntensityMult = branchPreFlashIntensityMult;
         le.branchFlashIntensityMult = branchFlashIntensityMult;
 
+        le.emissionColor = emissionColor;
+        le.fadedEmissionColor = fadedEmissionColor;
+        le.lineWidth = lineWidth * branchLineWidthMult;
+        le.dartLeaderLineWidth = dartLeaderLineWidth;
+
         le.fadeSpeed = fadeSpeed;
         le.drawSpeed = drawSpeed;
         le.numReturnStrokes = numReturnStrokes;
@@ -334,9 +340,6 @@ public class LightningEffect : LightningCreator
         le.randomnessWeight = randomnessWeight * randomnessWeightBranchMult;
         le.randomnessWeightBranchMult = randomnessWeightBranchMult;
         le.isPerpetual = isPerpetual;
-
-        LineRenderer branchLine = branch.GetComponent<LineRenderer>();
-        branchLine.widthMultiplier *= branchLineWidthMult;
     }
 
     void CalculateIfBranch(int i, Vector3 position)
