@@ -9,17 +9,6 @@ public class LightningEffect : LightningCreator
     LightningEffect parentBranch;
     public int pointOfDivergenceFromParent;
 
-    enum Stage
-    {
-        SteppedLeaderGrow,
-        SteppedLeaderFlash,
-        SteppedLeaderFade,
-        DartLeaderFlash,
-        DartLeaderFade,
-        Ended
-    }
-    Stage currentStage;
-
     LineRenderer lr;
     Material lineMaterial;
 
@@ -34,6 +23,18 @@ public class LightningEffect : LightningCreator
     Light lightSource;
     float timeSinceFlash;
     int numFlashesCompleted;
+
+
+    enum Stage
+    {
+        SteppedLeaderGrow,
+        SteppedLeaderFlash,
+        SteppedLeaderFade,
+        DartLeaderFlash,
+        DartLeaderFade,
+        Ended
+    }
+    Stage currentStage;
 
 
     // Start is called before the first frame update
@@ -56,6 +57,7 @@ public class LightningEffect : LightningCreator
         lineMaterial = lr.material;
         lr.SetPosition(0, sourcePos);
     }
+
 
     // Update is called once per frame
     void Update()
@@ -161,6 +163,7 @@ public class LightningEffect : LightningCreator
 
     }
 
+
     void Grow()
     {
         float distanceTravelled = Time.deltaTime * drawSpeed;
@@ -254,6 +257,7 @@ public class LightningEffect : LightningCreator
         }
     }
 
+
     void MoveLinePos()
     {
         timeSinceSegmentCreation += Time.deltaTime;
@@ -261,6 +265,7 @@ public class LightningEffect : LightningCreator
         lr.SetPosition(segmentPointer, newLinePos);
         transform.position = newLinePos;
     }
+
 
     bool CheckDistanceToTarget()
     {
@@ -341,6 +346,7 @@ public class LightningEffect : LightningCreator
         le.randomnessWeightBranchMult = randomnessWeightBranchMult;
         le.isPerpetual = isPerpetual;
     }
+
 
     void CalculateIfBranch(int i, Vector3 position)
     {
