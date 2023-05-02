@@ -7,12 +7,15 @@ public class LightningEffect : LightningCreator
     public Vector3 sourcePos;
     public Vector3 targetPos;
     LightningEffect parentBranch;
+    public int pointOfDivergenceFromParent;
 
     enum Stage
     {
-        Grow,
-        Flash,
-        Fade,
+        SteppedLeaderGrow,
+        SteppedLeaderFlash,
+        SteppedLeaderFade,
+        DartLeaderFlash,
+        DartLeaderFade,
         Ended
     }
     Stage currentStage;
@@ -30,6 +33,7 @@ public class LightningEffect : LightningCreator
 
     Light lightSource;
     float timeSinceFlash;
+    int numFlashesCompleted;
 
 
     // Start is called before the first frame update
@@ -37,13 +41,14 @@ public class LightningEffect : LightningCreator
     {
         transform.position = sourcePos;
         branchesRemaining = maxBranchCount;
-        currentStage = Stage.Grow;
+        currentStage = Stage.SteppedLeaderGrow;
         currentSegmentPos = sourcePos;
         segmentPointer = 0;
         error = 0.0f;
 
         lightSource = GetComponent<Light>();
         lightSource.intensity = preFlashIntensity;
+        numFlashesCompleted = 0;
 
         lr = GetComponent<LineRenderer>();
         lr.positionCount = 1;
@@ -54,32 +59,35 @@ public class LightningEffect : LightningCreator
     // Update is called once per frame
     void Update()
     {
-        if (parentBranch & currentStage == Stage.Grow) //If this instance is a branch of a bigger lightning section, then stop growing when parent reaches destination
+        if (parentBranch & currentStage == Stage.SteppedLeaderGrow) //If this instance is a branch of a bigger lightning section, then stop growing when parent reaches destination
         {
-            if (parentBranch.currentStage != Stage.Grow)
+            if (parentBranch.currentStage != Stage.SteppedLeaderGrow)
             {
-                currentStage = Stage.Flash;
+                currentStage = Stage.SteppedLeaderFlash;
             }
         }
 
-        if (currentStage == Stage.Grow)
+        if (currentStage == Stage.SteppedLeaderGrow)
         {
             Grow();
         }
 
-        else if (currentStage == Stage.Flash)
+        else if (currentStage == Stage.SteppedLeaderFlash)
         {
-            if (parentBranch) { parentBranch.currentStage = Stage.Flash; } //Makes whole structure flash if sub-branch reaches target first
+            if (parentBranch)//Makes whole structure flash if sub-branch reaches target first
+            {
+                if (parentBranch.currentStage == Stage.SteppedLeaderGrow) { parentBranch.currentStage = Stage.SteppedLeaderFlash; }
+            }
             lightSource.intensity = flashIntensity; //Set point light intensity
             timeSinceFlash = 0.0f;
             lineMaterial.SetColor("_EmissionColor", emissionColor); //Set line renderer's material emission colour
             if (!isPerpetual)
             {
-                currentStage = Stage.Fade;
+                currentStage = Stage.SteppedLeaderFade;
             }
         }
 
-        else if (currentStage == Stage.Fade)
+        else if (currentStage == Stage.SteppedLeaderFade)
         {
             timeSinceFlash += Time.deltaTime;
             if (lightSource.intensity > 0)
@@ -91,6 +99,57 @@ public class LightningEffect : LightningCreator
             {
                 currentStage = Stage.Ended;
             }
+        }
+
+        else if (currentStage == Stage.DartLeaderFlash)
+        {
+            if(numFlashesCompleted == 0)
+            {
+                if (parentBranch) //Makes whole structure flash if sub-branch reaches target first, and make sure whole path flashes properly
+                {
+                    parentBranch.currentStage = Stage.SteppedLeaderFlash;
+                    CalculateDartLeaderPath();
+                }
+                lr.widthMultiplier = dartLeaderLineWidth;
+            }
+            lightSource.intensity = flashIntensity;
+            timeSinceFlash = 0.0f;
+            lineMaterial.SetColor("_EmissionColor", emissionColor); //Set line renderer's material emission colour
+            if (!isPerpetual)
+            {
+                numFlashesCompleted++;
+                currentStage = Stage.DartLeaderFade;
+            }
+        }
+
+        else if (currentStage == Stage.DartLeaderFade)
+        {
+            timeSinceFlash += Time.deltaTime;
+            if(numFlashesCompleted < numReturnStrokes)
+            {
+                if(lightSource.intensity > 0)
+                {
+                    lightSource.intensity = Mathf.Lerp(flashIntensity, 0, timeSinceFlash * returnStrokeSpeed);
+                    lineMaterial.SetColor("_EmissionColor", Color.Lerp(emissionColor, fadedEmissionColor, timeSinceFlash * returnStrokeSpeed));
+                }
+                else
+                {
+                    currentStage = Stage.DartLeaderFlash;
+                }
+            }
+            else
+            {
+                if (lightSource.intensity > 0)
+                {
+                    lightSource.intensity = Mathf.Lerp(flashIntensity, 0, timeSinceFlash * dartLeaderFadeSpeed);
+                    lineMaterial.SetColor("_EmissionColor", Color.Lerp(emissionColor, fadedEmissionColor, timeSinceFlash * dartLeaderFadeSpeed));
+                }
+                else
+                {
+                    currentStage = Stage.Ended;
+                }
+            }
+
         }
 
         else if (currentStage == Stage.Ended)
@@ -108,9 +167,9 @@ public class LightningEffect : LightningCreator
         {
             if (lr.GetPosition(segmentPointer) == currentSegmentPos) //Calculate new segment when previous segment finishes animating
             {
-                if (checkDistanceToTarget())
+                if (CheckDistanceToTarget())
                 {
-                    currentStage = Stage.Flash;
+                    currentStage = Stage.SteppedLeaderFlash;
                 }
                 else //First decide if branch will be generated, then create the next point on the path
                 {
@@ -121,7 +180,6 @@ public class LightningEffect : LightningCreator
 
                     segmentPointer++;
                     currentSegmentPos = GenerateSegment(segmentPointer);
-                    Debug.Log("new segment");
 
                     lr.positionCount++;
                     lr.SetPosition(segmentPointer, lr.GetPosition(segmentPointer - 1)); //Set position to beginning of new segment
@@ -130,7 +188,7 @@ public class LightningEffect : LightningCreator
             }
             else
             {
-                moveLinePos();
+                MoveLinePos();
             }
         }
         else //If distance travelled in a frame is more than the length of one segment, then generate and render segments in their entirety (>1 per frame if needed)
@@ -151,9 +209,9 @@ public class LightningEffect : LightningCreator
                 transform.position = currentSegmentPos;
                 error--;
 
-                if (checkDistanceToTarget())
+                if (CheckDistanceToTarget())
                 {
-                    currentStage = Stage.Flash;
+                    currentStage = Stage.DartLeaderFlash;
                     error = 0.0f;
                 }
 
@@ -161,7 +219,41 @@ public class LightningEffect : LightningCreator
         }
     }
 
-    void moveLinePos()
+
+    void CalculateDartLeaderPath()
+    {
+        //Get segment positions from parent branch(es) and add to this instance's line renderer
+        bool atMasterBranch = false;
+        LightningEffect currentBranch = this;
+        int currentBranchPoint;
+        while (!atMasterBranch)
+        {
+            if (!currentBranch.parentBranch)
+            {
+                atMasterBranch = true;
+            }
+            else
+            {
+                currentBranchPoint = currentBranch.pointOfDivergenceFromParent;
+                currentBranch = currentBranch.parentBranch;
+                //Shift all linerenderer positions upwards
+                int oldPositionCount = lr.positionCount;
+                lr.positionCount += currentBranchPoint + 1;
+                for(int i=oldPositionCount-1; i>0; i--)
+                {
+                    lr.SetPosition(i + currentBranchPoint, lr.GetPosition(i));
+                }
+                //Then add points from parent branch, up until it reaches the point where branching occurs
+                for(int i=0; i<=currentBranchPoint; i++)
+                {
+                    lr.SetPosition(i, currentBranch.lr.GetPosition(i));
+                }
+
+            }
+        }
+    }
+
+    void MoveLinePos()
     {
         timeSinceSegmentCreation += Time.deltaTime;
         Vector3 newLinePos = Vector3.Lerp(lr.GetPosition(segmentPointer - 1), currentSegmentPos, (timeSinceSegmentCreation * drawSpeed) / segmentSize);
@@ -169,7 +261,7 @@ public class LightningEffect : LightningCreator
         transform.position = newLinePos;
     }
 
-    bool checkDistanceToTarget()
+    bool CheckDistanceToTarget()
     {
         return Vector3.Distance(lr.GetPosition(segmentPointer), targetPos) < targetInnerThreshold;
     }
@@ -205,11 +297,12 @@ public class LightningEffect : LightningCreator
     }
 
 
-    void CreateBranch(Vector3 branchPoint)
+    void CreateBranch(int pointOfDivergence, Vector3 branchPoint)
     {
         GameObject branch = Instantiate(lightningObj) as GameObject;
         LightningEffect le = branch.GetComponent<LightningEffect>();
         le.parentBranch = this;
+        le.pointOfDivergenceFromParent = pointOfDivergence;
 
         le.sourcePos = branchPoint;
         le.targetPos = targetPos;
@@ -227,12 +320,15 @@ public class LightningEffect : LightningCreator
         le.maxBranchDepth = maxBranchDepth - 1;
 
         le.preFlashIntensity = preFlashIntensity * branchPreFlashIntensityMult;
-        le.flashIntensity = preFlashIntensity * branchPreFlashIntensityMult;
+        le.flashIntensity = flashIntensity * branchPreFlashIntensityMult;
         le.branchPreFlashIntensityMult = branchPreFlashIntensityMult;
         le.branchFlashIntensityMult = branchFlashIntensityMult;
 
         le.fadeSpeed = fadeSpeed;
         le.drawSpeed = drawSpeed;
+        le.numReturnStrokes = numReturnStrokes;
+        le.returnStrokeSpeed = returnStrokeSpeed;
+        le.dartLeaderFadeSpeed = dartLeaderFadeSpeed;
 
         le.maxAngleDirectionChange = maxAngleDirectionChange;
         le.randomnessWeight = randomnessWeight * randomnessWeightBranchMult;
@@ -250,7 +346,7 @@ public class LightningEffect : LightningCreator
             int numBranchesatPoint = Mathf.Min(branchesRemaining, Random.Range(1, maxBranchesAtPosition));
             for (int j = 0; j < numBranchesatPoint; j++)
             {
-                CreateBranch(position);
+                CreateBranch(i, position);
                 branchesRemaining--;
             }
             pointOfLastBranch = i;

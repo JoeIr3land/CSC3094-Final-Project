@@ -34,10 +34,14 @@ public class LightningCreator : MonoBehaviour
     [SerializeField] public Color emissionColor;
     [SerializeField] public Color fadedEmissionColor;
     [SerializeField] public float lineWidth;
+    [SerializeField] public float dartLeaderLineWidth;
 
     [Header("Animation")]
     [SerializeField] public float fadeSpeed;
     [SerializeField] public float drawSpeed;
+    [SerializeField] public int numReturnStrokes;
+    [SerializeField] public float returnStrokeSpeed;
+    [SerializeField] public float dartLeaderFadeSpeed;
 
     [Header("Path Randomness")]
     [SerializeField] public float maxAngleDirectionChange;
@@ -92,9 +96,13 @@ public class LightningCreator : MonoBehaviour
 
         le.emissionColor = emissionColor;
         le.fadedEmissionColor = fadedEmissionColor;
+        le.dartLeaderLineWidth = dartLeaderLineWidth;
 
         le.fadeSpeed = fadeSpeed;
         le.drawSpeed = drawSpeed;
+        le.numReturnStrokes = numReturnStrokes;
+        le.returnStrokeSpeed = returnStrokeSpeed;
+        le.dartLeaderFadeSpeed = dartLeaderFadeSpeed;
 
         le.maxAngleDirectionChange = maxAngleDirectionChange;
         le.randomnessWeight = randomnessWeight;
@@ -103,7 +111,7 @@ public class LightningCreator : MonoBehaviour
         le.isPerpetual = isPerpetual;
 
         LineRenderer lr = lightningBolt.GetComponent<LineRenderer>();
-        lr.widthMultiplier *= lineWidth;
+        lr.widthMultiplier = lineWidth;
 
     }
 }
