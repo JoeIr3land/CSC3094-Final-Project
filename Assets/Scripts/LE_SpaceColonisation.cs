@@ -88,11 +88,7 @@ public class LE_SpaceColonisation : LightningEffect
                 {
                     segmentPointer++;
                     currentSegmentPos = GenerateSegment(segmentPointer);
-
-                    if (maxBranchDepth > 1)
-                    {
-                        CalculateIfBranch(segmentPointer - 1, lr.GetPosition(segmentPointer - 1));
-                    }
+                    CalculateIfBranch(segmentPointer - 1, lr.GetPosition(segmentPointer - 1));
 
                     lr.positionCount++;
                     lr.SetPosition(segmentPointer, lr.GetPosition(segmentPointer - 1)); //Set position to beginning of new segment
@@ -111,11 +107,7 @@ public class LE_SpaceColonisation : LightningEffect
             {
                 segmentPointer++;
                 currentSegmentPos = GenerateSegment(segmentPointer);
-
-                if (maxBranchDepth > 1)
-                {
-                    CalculateIfBranch(segmentPointer - 1, lr.GetPosition(segmentPointer - 1));
-                }
+                CalculateIfBranch(segmentPointer - 1, lr.GetPosition(segmentPointer - 1));
 
                 lr.positionCount++;
                 lr.SetPosition(segmentPointer, currentSegmentPos); //Set position to end of new segment
@@ -142,19 +134,21 @@ public class LE_SpaceColonisation : LightningEffect
 
     Vector3 GenerateSegment(int segmentNumber)
     {
-        Vector3 prevSegment = lr.GetPosition(segmentNumber - 1);
-        float distanceToTarget = Vector3.Distance(prevSegment, targetPos);
-        if (distanceToTarget < segmentSize) { return targetPos; } //If distance to target is less than the length of a node, then return the target node to prevent overshooting and circling back
-
-        //Direction to target
-        Vector3 directionToTarget = (targetPos - prevSegment).normalized;
-        Debug.Log("Direction to target");
-        Debug.Log(directionToTarget);
-
         Vector3 directionPreviousSegment;
         List<Vector3> attractorsInRange;
         Vector3 directionToAttractors;
         Vector3 newDirection;
+        Vector3 prevSegment = lr.GetPosition(segmentNumber - 1);
+        float distanceToTarget = Vector3.Distance(prevSegment, targetPos);
+        if (distanceToTarget < segmentSize) { return targetPos; } //If distance to target is less than the length of a node, then return the target node to prevent overshooting and circling back
+
+        //Random direction
+        Vector3 directionRandom = new Vector3(Random.Range(-1.0f, 1.0f),
+                                      Random.Range(-1.0f, 1.0f),
+                                      Random.Range(-1.0f, 1.0f));
+
+        //Direction to target
+        Vector3 directionToTarget = (targetPos - prevSegment).normalized;
 
         //Direction of previous segment (if first segment after start, then direction = direct vector)
         if (segmentNumber > 1) { directionPreviousSegment = (prevSegment - lr.GetPosition(segmentNumber - 2)).normalized; }
@@ -169,14 +163,17 @@ public class LE_SpaceColonisation : LightningEffect
         else
         {
             directionToAttractors = (attractorsInRange[0] - prevSegment).normalized;
+            Debug.DrawLine(prevSegment, attractorsInRange[0]);
             for (int i = 1; i < attractorsInRange.Count; i++)
             {
                 directionToAttractors += (attractorsInRange[i] - prevSegment); //Add directions from prev segment towards each attractor together
+                Debug.DrawLine(prevSegment, attractorsInRange[i]);
             }
             directionToAttractors = directionToAttractors.normalized;
         }
-        Debug.Log("Direction to attractors");
-        Debug.Log(directionToAttractors);
+
+        //Adjust direction to attractors by random amount to prevent branches from following a similar path
+        directionToAttractors = Vector3.Lerp(directionToAttractors, directionRandom, randomInfluenceWeight);
 
         //Interpolate direction between moving directly to target, and moving towards attractors (when near target, move directly to target)
         if(distanceToTarget > targetOuterThreshold) 
@@ -186,12 +183,7 @@ public class LE_SpaceColonisation : LightningEffect
         else { newDirection = directionToTarget; }
 
         //Calculate new node position
-        Vector3 newPosition = prevSegment + (newDirection * segmentSize);
-
-        Debug.Log("new direction");
-        Debug.Log(newDirection);
-        Debug.Log("new position");
-        Debug.Log(newPosition);
+        Vector3 newPosition = (prevSegment + (newDirection * segmentSize));
 
         return newPosition;
     }
@@ -200,7 +192,7 @@ public class LE_SpaceColonisation : LightningEffect
     void CalculateIfBranch(int i, Vector3 position)
     {
         bool deletionOccurred = att.KillAttractorsInRange(currentSegmentPos, attractorInnerBound);
-        if ((branchesRemaining > 0) && deletionOccurred && (i - pointOfLastBranch > minSegmentsBetweenBranching) && att.GetAttractorsInRange(position, attractorOuterBound).Count > 0)
+        if ((maxBranchDepth > 1) && (branchesRemaining > 0) && deletionOccurred && (i - pointOfLastBranch > minSegmentsBetweenBranching) && att.GetAttractorsInRange(position, attractorOuterBound).Count > 0)
         {
             branchesRemaining--;
             CreateBranch(i, position);
