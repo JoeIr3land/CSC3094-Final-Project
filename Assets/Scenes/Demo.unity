@@ -398,7 +398,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2438151582683850686, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
       propertyPath: m_Name
-      value: LightningCreator (1)
+      value: LightningCreator - Space colonisation
       objectReference: {fileID: 0}
     - target: {fileID: 2438151582683850686, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
       propertyPath: m_IsActive
@@ -991,7 +991,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2438151582683850686, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
       propertyPath: m_Name
-      value: LightningCreator
+      value: LightningCreator - Pure RNG
       objectReference: {fileID: 0}
     - target: {fileID: 2438151582683850686, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
       propertyPath: m_IsActive
