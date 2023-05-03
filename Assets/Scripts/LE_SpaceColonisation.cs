@@ -248,7 +248,9 @@ public class LE_SpaceColonisation : LightningEffect
         le.attractorOuterBound = attractorOuterBound;
         le.attractorInnerBound = attractorInnerBound;
         le.attractorObj = attractorObj;
-        le.attractorInfluenceWeight = attractorInfluenceWeight;
+        le.attractorInfluenceWeight = attractorInfluenceWeight * branchAttractorInfluenceWeightMult;
+        le.randomInfluenceWeight = randomInfluenceWeight;
+        le.branchAttractorInfluenceWeightMult = branchAttractorInfluenceWeightMult;
     }
 
 }

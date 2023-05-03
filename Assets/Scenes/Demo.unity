@@ -254,7 +254,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
       propertyPath: drawSpeed
-      value: 100
+      value: 1000
       objectReference: {fileID: 0}
     - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
       propertyPath: fadeSpeed
@@ -310,7 +310,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
       propertyPath: num_attractors
-      value: 5000
+      value: 10000
       objectReference: {fileID: 0}
     - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
       propertyPath: numReturnStrokes
@@ -370,7 +370,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
       propertyPath: randomInfluenceWeight
-      value: 0
+      value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
       propertyPath: randomScaleBranchPath
@@ -390,7 +390,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
       propertyPath: attractorInfluenceWeight
-      value: 0.75
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
       propertyPath: chanceOfBranchAtPosition
@@ -406,7 +406,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
       propertyPath: minSegmentsBetweenBranching
-      value: 20
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
+      propertyPath: branchAttractorInfluenceWeightMult
+      value: 1.3
       objectReference: {fileID: 0}
     - target: {fileID: 2438151582683850686, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
       propertyPath: m_Name

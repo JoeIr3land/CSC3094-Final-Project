@@ -63,6 +63,7 @@ public class LightningCreator : MonoBehaviour
     [SerializeField] public float attractorOuterBound;
     [SerializeField] public float attractorInnerBound;
     [SerializeField] public float randomInfluenceWeight;
+    [SerializeField] public float branchAttractorInfluenceWeightMult;
 
 
     // Start is called before the first frame update
@@ -136,6 +137,7 @@ public class LightningCreator : MonoBehaviour
             le.attractorObj = attractors;
             le.attractorInfluenceWeight = attractorInfluenceWeight;
             le.randomInfluenceWeight = randomInfluenceWeight;
+            le.branchAttractorInfluenceWeightMult = branchAttractorInfluenceWeightMult;
         }
 
     }
