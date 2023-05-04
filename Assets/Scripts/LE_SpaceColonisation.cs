@@ -29,6 +29,7 @@ public class LE_SpaceColonisation : LightningEffect
         lr.SetPosition(0, sourcePos);
 
         att = attractorObj.GetComponent<Attractors>();
+
     }
 
     // Update is called once per frame

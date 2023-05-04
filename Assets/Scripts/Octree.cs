@@ -63,7 +63,6 @@ public class Octree
 
     private List<Vector3> InsertAttractors(Node node, List<Vector3> attractors)
     {
-        Debug.Log(attractors.Count);
         foreach (Vector3 attractor in attractors)
         {
             if (node.boundary.Contains(attractor))

@@ -133,7 +133,7 @@ public class LightningCreator : MonoBehaviour
             att.num_attractors = (int)((float)num_attractors * scaleModifier);
             att.boundsCentre = attractorBoundsCentre;
             att.boundsRadius = attractorBoundsRadius;
-            att.maxAttractorsPerOctree = maxAttractorsPerOctree;
+            att.maxAttractorsPerOctree = (int)((float)maxAttractorsPerOctree * scaleModifier);
             le.attractorOuterBound = attractorOuterBound * scaleModifier;
             le.attractorInnerBound = attractorInnerBound * scaleModifier;
             le.attractorObj = attractors;
@@ -141,6 +141,7 @@ public class LightningCreator : MonoBehaviour
             le.randomInfluenceWeight = randomInfluenceWeight;
             le.branchAttractorInfluenceWeightMult = branchAttractorInfluenceWeightMult;
         }
+
 
     }
 }
