@@ -57,13 +57,14 @@ public class LightningCreator : MonoBehaviour
 
     [Header("Space Colonisation Parameters")]
     [SerializeField] public int num_attractors;
-    [SerializeField] public float attractorSphereCentre;
-    [SerializeField] public float attractorSphereRadius;
+    [SerializeField] public float attractorBoundsCentre;
+    [SerializeField] public float attractorBoundsRadius;
     [SerializeField] public float attractorInfluenceWeight;
     [SerializeField] public float attractorOuterBound;
     [SerializeField] public float attractorInnerBound;
     [SerializeField] public float randomInfluenceWeight;
     [SerializeField] public float branchAttractorInfluenceWeightMult;
+    [SerializeField] public int maxAttractorsPerOctree;
 
 
     // Start is called before the first frame update
@@ -130,8 +131,9 @@ public class LightningCreator : MonoBehaviour
             att.sourcePos = start;
             att.targetPos = target;
             att.num_attractors = (int)((float)num_attractors * scaleModifier);
-            att.sphereCentre = attractorSphereCentre;
-            att.sphereRadius = attractorSphereRadius;
+            att.boundsCentre = attractorBoundsCentre;
+            att.boundsRadius = attractorBoundsRadius;
+            att.maxAttractorsPerOctree = maxAttractorsPerOctree;
             le.attractorOuterBound = attractorOuterBound * scaleModifier;
             le.attractorInnerBound = attractorInnerBound * scaleModifier;
             le.attractorObj = attractors;

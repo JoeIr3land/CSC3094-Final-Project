@@ -7,61 +7,75 @@ public class Attractors : MonoBehaviour
     public Vector3 sourcePos;
     public Vector3 targetPos;
     public int num_attractors;
-    public float sphereCentre;
-    public float sphereRadius;
+    public float boundsCentre;
+    public float boundsRadius;
 
-    public List<Vector3> attractorsList;
-
+    public Octree attractors;
+    public int maxAttractorsPerOctree;
 
     // Start is called before the first frame update
     void Start()
     {
-        attractorsList = new List<Vector3>();
-        GenerateAttractors();
+        attractors = GenerateAttractors();
     }
 
-    private void GenerateAttractors()
+    private Octree GenerateAttractors()
     {
-        float sphereRadius_Adjusted = sphereRadius * 0.5f * ((targetPos - sourcePos).magnitude); //sphereRadius refers to radius size relative to halfway distance between source and target
+        List<Vector3> attractorsList = new List<Vector3>();
+        float boundsRadius_InWorldCoords = boundsRadius * 0.5f * ((targetPos - sourcePos).magnitude); //boundsRadius refers to radius size relative to halfway distance between source and target
+        Vector3 boundsCentre_InWorldCoords = Vector3.Lerp(sourcePos, targetPos, boundsCentre); //boundsCentre refers to where along the line between source and target
         for (int i = 0; i < num_attractors; i++)
         {
             //Initially place attractor at a point between source and target
-            Vector3 newAttractor = Vector3.Lerp(sourcePos, targetPos, sphereCentre); //sphereCenter refers to where along the line between source and target
-            Vector3 randomVector = new Vector3(Random.Range(-sphereRadius_Adjusted, sphereRadius_Adjusted),
-                                               Random.Range(-sphereRadius_Adjusted, sphereRadius_Adjusted),
-                                               Random.Range(-sphereRadius_Adjusted, sphereRadius_Adjusted));
+            Vector3 newAttractor = boundsCentre_InWorldCoords; 
+            Vector3 randomVector = new Vector3(Random.Range(-boundsRadius_InWorldCoords, boundsRadius_InWorldCoords),
+                                               Random.Range(-boundsRadius_InWorldCoords, boundsRadius_InWorldCoords),
+                                               Random.Range(-boundsRadius_InWorldCoords, boundsRadius_InWorldCoords));
             newAttractor += randomVector;
             attractorsList.Add(newAttractor);
         }
+
+        Octree ot = new Octree();
+        ot.rootCentre = boundsCentre_InWorldCoords;
+        ot.boundsRadius = boundsRadius_InWorldCoords;
+        ot.allAttractors = attractorsList;
+        ot.maxAttractorsPerOctree = maxAttractorsPerOctree;
+        ot.Start();
+        return ot;
     }
+
 
     public List<Vector3> GetAttractorsInRange(Vector3 pos, float bound)
     {
+        List<Vector3> possibleAttractors =  attractors.Search(pos, bound);
         List<Vector3> attractorsInRange = new List<Vector3>();
-        for (int i = 0; i < attractorsList.Count; i++)
+        for (int i = 0; i < possibleAttractors.Count; i++)
         {
-            float distance = (attractorsList[i] - pos).magnitude;
-            if (distance <= bound) { attractorsInRange.Add(attractorsList[i]); }
+            float distance = (possibleAttractors[i] - pos).magnitude;
+            if (distance <= bound) { attractorsInRange.Add(possibleAttractors[i]); }
         }
         return attractorsInRange;
     }
 
+
     public bool KillAttractorsInRange(Vector3 pos, float bound)
     {
-        int i = 0;
-        bool doneIterating = false;
-        bool deleteoccurred = false;
-        while (!doneIterating)
+        List<Vector3> attractorsToCheck = attractors.Search(pos, bound);
+        bool deleteOccurred = false;
+        if(attractorsToCheck != null)
         {
-            float distance = (attractorsList[i] - pos).magnitude;
-            if (distance <= bound)
+            for(int i=0; i< attractorsToCheck.Count; i++)
             {
-                attractorsList.RemoveAt(i);
-                deleteoccurred = true;
+                float distance = (attractorsToCheck[i] - pos).magnitude;
+                if (distance <= bound)
+                {
+                    attractors.RemoveAttractor(attractorsToCheck[i], attractors.root);
+                    deleteOccurred = true;
+                }
             }
-            else { i++; }
-            if(i >= attractorsList.Count) { doneIterating = true; }
         }
-        return deleteoccurred;
+        return deleteOccurred;
     }
+
+
 }

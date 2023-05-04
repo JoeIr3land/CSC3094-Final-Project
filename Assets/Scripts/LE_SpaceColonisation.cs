@@ -156,7 +156,7 @@ public class LE_SpaceColonisation : LightningEffect
 
         //Direction towards attractors in range
         attractorsInRange = att.GetAttractorsInRange(prevSegment, attractorOuterBound);
-        if (attractorsInRange.Count == 0) 
+        if (attractorsInRange == null || attractorsInRange.Count == 0)
         {
             directionToAttractors = directionPreviousSegment;//If no attractors remaining, keep going in straight line
         }
