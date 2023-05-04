@@ -306,7 +306,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
       propertyPath: maxBranchDepth
-      value: 5
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
       propertyPath: num_attractors
@@ -357,6 +357,14 @@ PrefabInstance:
       value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
+      propertyPath: attractorBoundsCentre
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
+      propertyPath: attractorBoundsRadius
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
       propertyPath: attractorSphereCentre
       value: 0.5
       objectReference: {fileID: 0}
@@ -375,6 +383,10 @@ PrefabInstance:
     - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
       propertyPath: randomScaleBranchPath
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
+      propertyPath: maxAttractorsPerOctree
+      value: 1000
       objectReference: {fileID: 0}
     - target: {fileID: 2438151582683850681, guid: adb904bde17354d47a287c8be2fa4bec, type: 3}
       propertyPath: chanceOfBranchScaleMult
