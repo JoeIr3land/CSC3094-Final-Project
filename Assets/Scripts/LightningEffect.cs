@@ -24,6 +24,9 @@ public class LightningEffect : LightningCreator
     protected float timeSinceFlash;
     protected int numFlashesCompleted;
 
+    protected bool isDartLeader;
+    public GameObject lightningCreatorObj;
+
 
     public enum Stage
     {
@@ -56,6 +59,8 @@ public class LightningEffect : LightningCreator
         lr.widthMultiplier = lineWidth;
         lineMaterial = lr.material;
         lr.SetPosition(0, sourcePos);
+
+        isDartLeader = false;
     }
 
 
@@ -87,6 +92,7 @@ public class LightningEffect : LightningCreator
 
         else if (currentStage == Stage.DartLeaderFlash)
         {
+            isDartLeader = true;
             DartLeaderFlash();
         }
 
@@ -247,6 +253,10 @@ public class LightningEffect : LightningCreator
 
     protected void End()
     {
+        if (isDartLeader)
+        {
+            lightningCreatorObj.GetComponent<LightningCreator>().pr.OutputResults();
+        }
         Destroy(lineMaterial);
         Destroy(gameObject);
     }

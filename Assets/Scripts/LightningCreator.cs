@@ -66,19 +66,30 @@ public class LightningCreator : MonoBehaviour
     [SerializeField] public float branchAttractorInfluenceWeightMult;
     [SerializeField] public int maxAttractorsPerOctree;
 
+    [Header("Performance results text object")]
+    [SerializeField] private GameObject performanceResultsObj;
+    public PerformanceResults pr;
+
+    [Header("Activation button")]
+    [SerializeField] private string activationButton;
+
 
     // Start is called before the first frame update
     void Start()
     {
-
+        pr = performanceResultsObj.GetComponent<PerformanceResults>();
+        performanceResultsObj.SetActive(false);
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetButtonDown("Fire1"))
+
+        if (Input.GetKeyDown(activationButton))
         {
             CreateLightningBolt(source, target);
+            performanceResultsObj.SetActive(false); //Clear and restart testing
+            performanceResultsObj.SetActive(true);
         }
     }
 
@@ -123,6 +134,7 @@ public class LightningCreator : MonoBehaviour
         le.randomnessWeightBranchMult = randomnessWeightBranchMult;
 
         le.isPerpetual = isPerpetual;
+        le.lightningCreatorObj = gameObject;
 
         if(le.GetType() == typeof(LE_SpaceColonisation))
         {

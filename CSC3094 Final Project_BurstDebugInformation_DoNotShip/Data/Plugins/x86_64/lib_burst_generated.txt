@@ -151,6 +151,7 @@ Library: lib_burst_generated
 --root-assembly=C:\Users\joeir\Documents\Unity Projects\CSC3094 Final Project\Temp\StagingArea\Data\Managed\Unity.Timeline.dll
 --root-assembly=C:\Users\joeir\Documents\Unity Projects\CSC3094 Final Project\Temp\StagingArea\Data\Managed\Unity.RenderPipeline.Universal.ShaderLibrary.dll
 --root-assembly=C:\Users\joeir\Documents\Unity Projects\CSC3094 Final Project\Temp\StagingArea\Data\Managed\Unity.Services.Core.Environments.dll
+--root-assembly=C:\Users\joeir\Documents\Unity Projects\CSC3094 Final Project\Temp\StagingArea\Data\Managed\Assembly-CSharp.dll
 --root-assembly=C:\Users\joeir\Documents\Unity Projects\CSC3094 Final Project\Temp\StagingArea\Data\Managed\Unity.Services.Core.Internal.dll
 --root-assembly=C:\Users\joeir\Documents\Unity Projects\CSC3094 Final Project\Temp\StagingArea\Data\Managed\Unity.Services.Core.Analytics.dll
 --root-assembly=C:\Users\joeir\Documents\Unity Projects\CSC3094 Final Project\Temp\StagingArea\Data\Managed\Unity.Services.Core.Scheduler.dll
@@ -161,7 +162,6 @@ Library: lib_burst_generated
 --root-assembly=C:\Users\joeir\Documents\Unity Projects\CSC3094 Final Project\Temp\StagingArea\Data\Managed\Unity.Services.Core.dll
 --root-assembly=C:\Users\joeir\Documents\Unity Projects\CSC3094 Final Project\Temp\StagingArea\Data\Managed\Unity.RenderPipelines.Core.ShaderLibrary.dll
 --root-assembly=C:\Users\joeir\Documents\Unity Projects\CSC3094 Final Project\Temp\StagingArea\Data\Managed\Unity.Services.Core.Configuration.dll
---root-assembly=C:\Users\joeir\Documents\Unity Projects\CSC3094 Final Project\Temp\StagingArea\Data\Managed\Assembly-CSharp.dll
 --root-assembly=C:\Users\joeir\Documents\Unity Projects\CSC3094 Final Project\Temp\StagingArea\Data\Managed\Unity.RenderPipelines.Universal.Shaders.dll
 --root-assembly=C:\Users\joeir\Documents\Unity Projects\CSC3094 Final Project\Temp\StagingArea\Data\Managed\Unity.RenderPipelines.ShaderGraph.ShaderGraphLibrary.dll
 --assembly-folder=C:\Users\joeir\Documents\Unity Projects\CSC3094 Final Project\Temp\StagingArea\Data\Managed\
@@ -331,6 +331,7 @@ Library: lib_burst_generated
 --root-assembly=C:\Users\joeir\Documents\Unity Projects\CSC3094 Final Project\Temp\StagingArea\Data\Managed\Unity.Timeline.dll
 --root-assembly=C:\Users\joeir\Documents\Unity Projects\CSC3094 Final Project\Temp\StagingArea\Data\Managed\Unity.RenderPipeline.Universal.ShaderLibrary.dll
 --root-assembly=C:\Users\joeir\Documents\Unity Projects\CSC3094 Final Project\Temp\StagingArea\Data\Managed\Unity.Services.Core.Environments.dll
+--root-assembly=C:\Users\joeir\Documents\Unity Projects\CSC3094 Final Project\Temp\StagingArea\Data\Managed\Assembly-CSharp.dll
 --root-assembly=C:\Users\joeir\Documents\Unity Projects\CSC3094 Final Project\Temp\StagingArea\Data\Managed\Unity.Services.Core.Internal.dll
 --root-assembly=C:\Users\joeir\Documents\Unity Projects\CSC3094 Final Project\Temp\StagingArea\Data\Managed\Unity.Services.Core.Analytics.dll
 --root-assembly=C:\Users\joeir\Documents\Unity Projects\CSC3094 Final Project\Temp\StagingArea\Data\Managed\Unity.Services.Core.Scheduler.dll
@@ -341,7 +342,6 @@ Library: lib_burst_generated
 --root-assembly=C:\Users\joeir\Documents\Unity Projects\CSC3094 Final Project\Temp\StagingArea\Data\Managed\Unity.Services.Core.dll
 --root-assembly=C:\Users\joeir\Documents\Unity Projects\CSC3094 Final Project\Temp\StagingArea\Data\Managed\Unity.RenderPipelines.Core.ShaderLibrary.dll
 --root-assembly=C:\Users\joeir\Documents\Unity Projects\CSC3094 Final Project\Temp\StagingArea\Data\Managed\Unity.Services.Core.Configuration.dll
---root-assembly=C:\Users\joeir\Documents\Unity Projects\CSC3094 Final Project\Temp\StagingArea\Data\Managed\Assembly-CSharp.dll
 --root-assembly=C:\Users\joeir\Documents\Unity Projects\CSC3094 Final Project\Temp\StagingArea\Data\Managed\Unity.RenderPipelines.Universal.Shaders.dll
 --root-assembly=C:\Users\joeir\Documents\Unity Projects\CSC3094 Final Project\Temp\StagingArea\Data\Managed\Unity.RenderPipelines.ShaderGraph.ShaderGraphLibrary.dll
 --assembly-folder=C:\Users\joeir\Documents\Unity Projects\CSC3094 Final Project\Temp\StagingArea\Data\Managed\

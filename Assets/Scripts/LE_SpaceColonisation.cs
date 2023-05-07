@@ -60,6 +60,7 @@ public class LE_SpaceColonisation : LightningEffect
 
         else if (currentStage == Stage.DartLeaderFlash)
         {
+            isDartLeader = true;
             DartLeaderFlash();
         }
 
@@ -127,6 +128,10 @@ public class LE_SpaceColonisation : LightningEffect
 
     void End()
     {
+        if (isDartLeader)
+        {
+            lightningCreatorObj.GetComponent<LightningCreator>().pr.OutputResults();
+        }
         Destroy(lineMaterial);
         Destroy(attractorObj);
         Destroy(gameObject);
